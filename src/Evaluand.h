@@ -2,6 +2,7 @@
 #define MATCHR_EVALUAND_H
 
 #include "Object.h"
+#include "Context.h"
 
 namespace matchr {
 
@@ -24,6 +25,11 @@ class Evaluand: public Object {
 
     SEXP get_environment() {
         return r_environment_;
+    }
+
+    SEXP evaluate(Context context) {
+        SEXP environment = context.as_environment(get_environment());
+        return Rf_eval(get_expression(), environment);
     }
 
     static void initialize();

@@ -5,7 +5,8 @@ using matchr::Pattern;
 using matchr::PatternSPtr;
 
 SEXP r_pattern_create_pattern(SEXP r_expression) {
-    PatternSPtr pattern = std::make_shared<Pattern>(r_expression);
+    PatternSPtr pattern =
+        std::shared_ptr<Pattern>(Pattern::create(r_expression));
     return Pattern::to_sexp(pattern);
 }
 

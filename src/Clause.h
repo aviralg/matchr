@@ -24,6 +24,14 @@ class Clause: public Object {
         return evaluand_;
     }
 
+    Context match_expression(SEXP expression) {
+        return get_pattern()->match_expression(expression);
+    }
+
+    SEXP evaluate_expression(Context context) {
+        return get_evaluand()->evaluate(context);
+    }
+
     static void initialize();
 
     static void finalize();

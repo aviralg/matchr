@@ -1,4 +1,6 @@
 #include "Pattern.h"
+#include "IdentifierPattern.h"
+#include "WildcardPattern.h"
 
 namespace matchr {
 
@@ -43,6 +45,19 @@ SEXP Pattern::to_sexp(PatternSPtr pattern) {
 void Pattern::destroy_sexp(SEXP r_pattern) {
     delete static_cast<PatternSPtr*>(R_ExternalPtrAddr(r_pattern));
     R_SetExternalPtrAddr(r_pattern, NULL);
+}
+
+Pattern* Pattern::create(SEXP expression) {
+    Pattern* pattern = nullptr;
+
+    if (pattern = WildcardPattern::create(expression)) {
+        return pattern;
+    }
+    if (pattern = IdentifierPattern::create(expression)) {
+        return pattern;
+    }
+
+    return pattern;
 }
 
 } // namespace matchr

@@ -2,8 +2,10 @@
 #define MATCHR_PATTERN_H
 
 #include "Object.h"
+#include "Context.h"
 
 namespace matchr {
+
 class Pattern: public Object {
   public:
     explicit Pattern(SEXP r_expression): Object(), r_expression_(r_expression) {
@@ -18,6 +20,8 @@ class Pattern: public Object {
         return r_expression_;
     }
 
+    virtual Context match_expression(SEXP expression) const = 0;
+
     static void initialize();
 
     static void finalize();
@@ -29,6 +33,8 @@ class Pattern: public Object {
     static SEXP to_sexp(std::shared_ptr<Pattern> pattern);
 
     static void destroy_sexp(SEXP r_pattern);
+
+    static Pattern* create(SEXP expression);
 
   private:
     SEXP r_expression_;

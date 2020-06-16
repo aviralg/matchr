@@ -24,6 +24,14 @@ class Matcher: public Object {
     }
 
     SEXP match_expression(SEXP expression) {
+        for (int index = 0; index < get_clause_count(); ++index) {
+            ClauseSPtr clause = get_clause(index);
+            Context context = clause->match_expression(expression);
+            if (context) {
+                return clause->evaluate_expression(context);
+            }
+        }
+        /* TODO: add case for no matches */
         return R_NilValue;
     }
 
