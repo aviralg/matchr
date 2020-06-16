@@ -22,4 +22,3 @@ is_language <- function(object) {
 is_environment <- function(object) {
     is.environment(object)
 }
-

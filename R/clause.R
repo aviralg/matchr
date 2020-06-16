@@ -8,4 +8,4 @@ clause <- function(pattern, evaluand) {
 }
 
 #' @export
-`%~>%` <- clause
+`%~>%` <- clause # nolint

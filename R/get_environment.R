@@ -5,6 +5,6 @@ get_environment <- function(object, ...) {
 }
 
 #' @export
-get_environment.matchr_evaluand <- function(object, ...) {
+get_environment.matchr_evaluand <- function(object, ...) { # nolint
     .Call(C_evaluand_get_environment, object)
 }

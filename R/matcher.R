@@ -3,7 +3,7 @@
 matcher <- function(...) {
     clauses <- list(...)
 
-    for(clause in clauses) {
+    for (clause in clauses) {
         stopifnot(is_clause(clause))
     }
 

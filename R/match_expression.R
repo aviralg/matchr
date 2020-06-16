@@ -5,7 +5,7 @@ match_expression <- function(object, ...) {
 }
 
 #' @export
-match_expression.matchr_matcher <- function(object, ...) {
+match_expression.matchr_matcher <- function(object, ...) { # nolint
     exprs <- list(...)
     lapply(exprs, function(expr) .Call(C_matcher_match_expression, object, expr))
 }
