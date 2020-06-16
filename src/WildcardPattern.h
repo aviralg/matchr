@@ -11,8 +11,8 @@ class WildcardPattern: public Pattern {
     explicit WildcardPattern(SEXP expression): Pattern(expression) {
     }
 
-    Context match_expression(SEXP expression) const override final {
-        Context context(true);
+    Context& match_expression(SEXP expression,
+                              Context& context) const override final {
         return context;
     }
 

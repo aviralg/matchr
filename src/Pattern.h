@@ -20,7 +20,13 @@ class Pattern: public Object {
         return r_expression_;
     }
 
-    virtual Context match_expression(SEXP expression) const = 0;
+    virtual Context match_expression(SEXP expression) const {
+        Context context(true);
+        return match_expression(expression, context);
+    }
+
+    virtual Context& match_expression(SEXP expression,
+                                      Context& context) const = 0;
 
     static void initialize();
 

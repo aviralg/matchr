@@ -5,6 +5,7 @@
 #include "utilities.h"
 #include <string>
 #include <unordered_map>
+#include "equality.h"
 
 namespace matchr {
 
@@ -32,10 +33,14 @@ class Context: public Object {
     bool bind(const std::string identifier, SEXP expression) {
         auto iter = bindings_.find(identifier);
 
+        /* if this identifier is already bound to an expression, then compare
+         * that for equality with the argument expression  */
         if (iter != bindings_.end()) {
-            return false;
+            SEXP bound_expression = iter->second;
+            return is_equal(bound_expression, expression);
         }
 
+        /* add binding if identifier is not already bound */
         bindings_.insert({identifier, expression});
 
         return true;
