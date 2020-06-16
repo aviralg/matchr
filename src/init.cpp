@@ -1,3 +1,4 @@
+#include "r_matchr.h"
 #include "r_matcher.h"
 #include "r_clause.h"
 #include "r_pattern.h"
@@ -8,6 +9,10 @@
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
+    /* matchr */
+    {"matchr_initialize_matchr", (DL_FUNC) &r_matchr_initialize_matchr, 0},
+    {"matchr_finalize_matchr", (DL_FUNC) &r_matchr_finalize_matchr, 0},
+
     /* matcher */
     {"matcher_create_matcher", (DL_FUNC) &r_matcher_create_matcher, 1},
     {"matcher_get_clauses", (DL_FUNC) &r_matcher_get_clauses, 1},
@@ -34,4 +39,3 @@ void R_init_matchr(DllInfo* dll) {
     R_useDynamicSymbols(dll, FALSE);
 }
 }
-
