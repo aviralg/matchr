@@ -6,7 +6,7 @@
 #include <Rdefines.h>
 
 extern "C" {
-SEXP r_matchr_initialize_matchr();
+SEXP r_matchr_initialize_matchr(SEXP r_package_environment);
 SEXP r_matchr_finalize_matchr();
 }
 

@@ -10,7 +10,7 @@
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
     /* matchr */
-    {"matchr_initialize_matchr", (DL_FUNC) &r_matchr_initialize_matchr, 0},
+    {"matchr_initialize_matchr", (DL_FUNC) &r_matchr_initialize_matchr, 1},
     {"matchr_finalize_matchr", (DL_FUNC) &r_matchr_finalize_matchr, 0},
 
     /* matcher */

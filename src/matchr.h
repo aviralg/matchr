@@ -3,7 +3,7 @@
 
 namespace matchr {
 
-void initialize_matchr();
+void initialize_matchr(SEXP r_package_environment);
 
 void finalize_matchr();
 

@@ -1,3 +1,4 @@
+#include "utilities.h"
 #include "Matcher.h"
 #include "Clause.h"
 #include "Pattern.h"
@@ -8,9 +9,10 @@ namespace matchr {
 
 bool initialized = false;
 
-void initialize_matchr() {
+void initialize_matchr(SEXP r_package_environment) {
     if (!initialized) {
         initialized = true;
+        initialize_utilities(r_package_environment);
         Matcher::initialize();
         Clause::initialize();
         Pattern::initialize();

@@ -1,7 +1,7 @@
 
 .onLoad <- function(libname, pkgname) { # nolint
 
-    .Call(C_matchr_initialize_matchr)
+    .Call(C_matchr_initialize_matchr, parent.frame())
 
 }
 
