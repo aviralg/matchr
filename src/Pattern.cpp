@@ -1,6 +1,7 @@
 #include "Pattern.h"
 #include "IdentifierPattern.h"
 #include "WildcardPattern.h"
+#include "AndSequencePattern.h"
 
 namespace matchr {
 
@@ -54,6 +55,9 @@ Pattern* Pattern::create(SEXP expression) {
         return pattern;
     }
     if (pattern = IdentifierPattern::create(expression)) {
+        return pattern;
+    }
+    if (pattern = AndSequencePattern::create(expression)) {
         return pattern;
     }
 
