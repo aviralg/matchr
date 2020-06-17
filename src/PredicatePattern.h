@@ -35,6 +35,10 @@ class PredicatePattern: public Pattern {
         return context;
     }
 
+    IdentifierNames get_identifier_names() const override final {
+        return IdentifierNames();
+    }
+
     static PredicatePattern* create(SEXP r_expression, SEXP r_environment);
 };
 

@@ -22,9 +22,13 @@ class AndSequencePattern: public SequencePattern {
         return context;
     }
 
-    void add_pattern(Pattern* pattern) override final {
-        get_identifier_names().merge(pattern->get_identifier_names());
-        SequencePattern::add_pattern(pattern);
+    IdentifierNames get_identifier_names() const override final {
+        IdentifierNames identifier_names;
+        for (int index = 0; index < get_pattern_count(); ++index) {
+            const Pattern* pattern = get_pattern(index);
+            identifier_names.merge(pattern->get_identifier_names());
+        }
+        return identifier_names;
     }
 
     static AndSequencePattern* create(SEXP r_expression, SEXP r_environment);

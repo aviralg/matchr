@@ -14,7 +14,6 @@ class Pattern: public Object {
         : Object()
         , r_expression_(r_expression)
         , r_environment_(r_environment)
-        , identifier_names_()
         , range_(1, 1) {
         R_PreserveObject(r_expression_);
         R_PreserveObject(r_environment_);
@@ -41,13 +40,7 @@ class Pattern: public Object {
     virtual Context& match_expression(SEXP expression,
                                       Context& context) const = 0;
 
-    const IdentifierNames& get_identifier_names() const {
-        return identifier_names_;
-    }
-
-    IdentifierNames& get_identifier_names() {
-        return identifier_names_;
-    }
+    virtual IdentifierNames get_identifier_names() const = 0;
 
     const Range& get_range() const {
         return range_;
@@ -74,7 +67,6 @@ class Pattern: public Object {
   private:
     SEXP r_expression_;
     SEXP r_environment_;
-    IdentifierNames identifier_names_;
     Range range_;
 
     static SEXP class_;

@@ -12,7 +12,6 @@ class IdentifierPattern: public Pattern {
                                SEXP r_environment,
                                const std::string name)
         : Pattern(r_expression, r_environment), name_(name) {
-        get_identifier_names().add(name);
     }
 
     const std::string& get_name() const {
@@ -28,6 +27,10 @@ class IdentifierPattern: public Pattern {
         }
 
         return context;
+    }
+
+    IdentifierNames get_identifier_names() const override final {
+        return IdentifierNames(get_name());
     }
 
     static IdentifierPattern* create(SEXP r_expression, SEXP r_environment);

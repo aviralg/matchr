@@ -29,11 +29,13 @@ class OrSequencePattern: public SequencePattern {
         return context;
     }
 
-    void add_pattern(Pattern* pattern) override final {
+    IdentifierNames get_identifier_names() const override final {
+        IdentifierNames identifier_names;
         if (get_pattern_count() == 0) {
-            get_identifier_names() = pattern->get_identifier_names();
+            return IdentifierNames();
+        } else {
+            return get_pattern(0)->get_identifier_names();
         }
-        SequencePattern::add_pattern(pattern);
     }
 
     static OrSequencePattern* create(SEXP r_expression, SEXP r_environment);

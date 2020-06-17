@@ -29,6 +29,10 @@ class NotSequencePattern: public SequencePattern {
         return context;
     }
 
+    IdentifierNames get_identifier_names() const override final {
+        return IdentifierNames();
+    }
+
     static NotSequencePattern* create(SEXP r_expression, SEXP r_environment);
 };
 

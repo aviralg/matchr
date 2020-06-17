@@ -22,10 +22,18 @@ class RangePattern: public Pattern {
         delete pattern_;
     }
 
+    const Pattern* get_inner_pattern() const {
+        return pattern_;
+    }
+
     Context& match_expression(SEXP expression,
                               Context& context) const override final {
         context.set_success();
         return context;
+    }
+
+    IdentifierNames get_identifier_names() const override final {
+        return get_inner_pattern()->get_identifier_names();
     }
 
     static RangePattern* create(SEXP r_expression, SEXP r_environment);
