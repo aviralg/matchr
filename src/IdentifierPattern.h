@@ -10,6 +10,7 @@ class IdentifierPattern: public Pattern {
   public:
     explicit IdentifierPattern(SEXP expression, const std::string name)
         : Pattern(expression), name_(name) {
+        get_identifier_names().add(name);
     }
 
     const std::string& get_name() const {

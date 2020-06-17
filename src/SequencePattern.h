@@ -18,7 +18,7 @@ class SequencePattern: public Pattern {
         }
     }
 
-    void add_pattern(Pattern* pattern) {
+    virtual void add_pattern(Pattern* pattern) {
         patterns_.push_back(pattern);
     }
 

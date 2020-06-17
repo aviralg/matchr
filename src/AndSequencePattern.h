@@ -21,6 +21,11 @@ class AndSequencePattern: public SequencePattern {
         return context;
     }
 
+    void add_pattern(Pattern* pattern) override final {
+        get_identifier_names().merge(pattern->get_identifier_names());
+        SequencePattern::add_pattern(pattern);
+    }
+
     static AndSequencePattern* create(SEXP expression);
 };
 
