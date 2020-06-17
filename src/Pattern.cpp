@@ -1,4 +1,5 @@
 #include "Pattern.h"
+#include "GroupPattern.h"
 #include "IdentifierPattern.h"
 #include "WildcardPattern.h"
 #include "RangePattern.h"
@@ -55,6 +56,9 @@ void Pattern::destroy_sexp(SEXP r_pattern) {
 Pattern* Pattern::create(SEXP r_expression, SEXP r_environment) {
     Pattern* pattern = nullptr;
 
+    if (pattern = GroupPattern::create(r_expression, r_environment)) {
+        return pattern;
+    }
     if (pattern = WildcardPattern::create(r_expression, r_environment)) {
         return pattern;
     }
