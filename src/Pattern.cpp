@@ -1,6 +1,7 @@
 #include "Pattern.h"
 #include "IdentifierPattern.h"
 #include "WildcardPattern.h"
+#include "RangePattern.h"
 #include "AndSequencePattern.h"
 #include "OrSequencePattern.h"
 #include "NotSequencePattern.h"
@@ -57,6 +58,9 @@ Pattern* Pattern::create(SEXP expression) {
         return pattern;
     }
     if (pattern = IdentifierPattern::create(expression)) {
+        return pattern;
+    }
+    if (pattern = RangePattern::create(expression)) {
         return pattern;
     }
     if (pattern = AndSequencePattern::create(expression)) {
