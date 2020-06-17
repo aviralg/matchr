@@ -2,6 +2,7 @@
 #include "IdentifierPattern.h"
 #include "WildcardPattern.h"
 #include "RangePattern.h"
+#include "PredicatePattern.h"
 #include "AndSequencePattern.h"
 #include "OrSequencePattern.h"
 #include "NotSequencePattern.h"
@@ -51,25 +52,28 @@ void Pattern::destroy_sexp(SEXP r_pattern) {
     R_SetExternalPtrAddr(r_pattern, NULL);
 }
 
-Pattern* Pattern::create(SEXP expression) {
+Pattern* Pattern::create(SEXP r_expression, SEXP r_environment) {
     Pattern* pattern = nullptr;
 
-    if (pattern = WildcardPattern::create(expression)) {
+    if (pattern = WildcardPattern::create(r_expression, r_environment)) {
         return pattern;
     }
-    if (pattern = IdentifierPattern::create(expression)) {
+    if (pattern = IdentifierPattern::create(r_expression, r_environment)) {
         return pattern;
     }
-    if (pattern = RangePattern::create(expression)) {
+    if (pattern = RangePattern::create(r_expression, r_environment)) {
         return pattern;
     }
-    if (pattern = AndSequencePattern::create(expression)) {
+    if (pattern = PredicatePattern::create(r_expression, r_environment)) {
         return pattern;
     }
-    if (pattern = OrSequencePattern::create(expression)) {
+    if (pattern = AndSequencePattern::create(r_expression, r_environment)) {
         return pattern;
     }
-    if (pattern = NotSequencePattern::create(expression)) {
+    if (pattern = OrSequencePattern::create(r_expression, r_environment)) {
+        return pattern;
+    }
+    if (pattern = NotSequencePattern::create(r_expression, r_environment)) {
         return pattern;
     }
 

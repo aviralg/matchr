@@ -8,7 +8,8 @@ namespace matchr {
 
 class WildcardPattern: public Pattern {
   public:
-    explicit WildcardPattern(SEXP expression): Pattern(expression) {
+    explicit WildcardPattern(SEXP r_expression, SEXP r_environment)
+        : Pattern(r_expression, r_environment) {
     }
 
     Context& match_expression(SEXP expression,
@@ -17,7 +18,7 @@ class WildcardPattern: public Pattern {
         return context;
     }
 
-    static WildcardPattern* create(SEXP expression);
+    static WildcardPattern* create(SEXP r_expression, SEXP r_environment);
 };
 
 } // namespace matchr

@@ -9,7 +9,8 @@ namespace matchr {
 
 class SequencePattern: public Pattern {
   public:
-    explicit SequencePattern(SEXP expression): Pattern(expression) {
+    explicit SequencePattern(SEXP r_expression, SEXP r_environment)
+        : Pattern(r_expression, r_environment) {
     }
 
     virtual ~SequencePattern() {

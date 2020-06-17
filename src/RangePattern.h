@@ -8,11 +8,12 @@ namespace matchr {
 
 class RangePattern: public Pattern {
   public:
-    explicit RangePattern(SEXP expression,
+    explicit RangePattern(SEXP r_expression,
+                          SEXP r_environment,
                           Pattern* pattern,
                           int minimum,
                           int maximum)
-        : Pattern(expression), pattern_(pattern) {
+        : Pattern(r_expression, r_environment), pattern_(pattern) {
         get_range().set_minimum(minimum);
         get_range().set_maximum(maximum);
     }
@@ -27,7 +28,7 @@ class RangePattern: public Pattern {
         return context;
     }
 
-    static RangePattern* create(SEXP expression);
+    static RangePattern* create(SEXP r_expression, SEXP r_environment);
 
   private:
     Pattern* pattern_;

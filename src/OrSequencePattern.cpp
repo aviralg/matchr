@@ -3,25 +3,27 @@
 
 namespace matchr {
 
-OrSequencePattern* OrSequencePattern::create(SEXP expression) {
+OrSequencePattern* OrSequencePattern::create(SEXP r_expression,
+                                             SEXP r_environment) {
     /* pattern should be a function call */
-    if (TYPEOF(expression) != LANGSXP) {
+    if (TYPEOF(r_expression) != LANGSXP) {
         return nullptr;
     }
 
-    const char* name = CHAR(PRINTNAME(CAR(expression)));
+    const char* name = CHAR(PRINTNAME(CAR(r_expression)));
 
     /* pattern should begin with 'or'  */
     if (strcmp(name, "or") != 0) {
         return nullptr;
     }
 
-    OrSequencePattern* or_pattern = new OrSequencePattern(expression);
+    OrSequencePattern* or_pattern =
+        new OrSequencePattern(r_expression, r_environment);
 
     IdentifierNames* identifier_names = nullptr;
 
-    for (SEXP ptr = CDR(expression); ptr != R_NilValue; ptr = CDR(ptr)) {
-        Pattern* pattern = Pattern::create(CAR(ptr));
+    for (SEXP ptr = CDR(r_expression); ptr != R_NilValue; ptr = CDR(ptr)) {
+        Pattern* pattern = Pattern::create(CAR(ptr), r_environment);
         if (pattern == nullptr) {
             /* TODO: raise error here, or_pattern is invalid; or in the pattern
              * that is being constructed */

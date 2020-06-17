@@ -7,7 +7,8 @@ namespace matchr {
 
 class NotSequencePattern: public SequencePattern {
   public:
-    NotSequencePattern(SEXP expression): SequencePattern(expression) {
+    NotSequencePattern(SEXP r_expression, SEXP r_environment)
+        : SequencePattern(r_expression, r_environment) {
     }
 
     Context& match_expression(SEXP expression,
@@ -28,7 +29,7 @@ class NotSequencePattern: public SequencePattern {
         return context;
     }
 
-    static NotSequencePattern* create(SEXP expression);
+    static NotSequencePattern* create(SEXP r_expression, SEXP r_environment);
 };
 
 } // namespace matchr

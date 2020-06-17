@@ -3,16 +3,17 @@
 
 namespace matchr {
 
-WildcardPattern* WildcardPattern::create(SEXP expression) {
-    if (TYPEOF(expression) != SYMSXP) {
+WildcardPattern* WildcardPattern::create(SEXP r_expression,
+                                         SEXP r_environment) {
+    if (TYPEOF(r_expression) != SYMSXP) {
         return nullptr;
     }
 
-    if (strcmp(CHAR(PRINTNAME(expression)), ".") != 0) {
+    if (strcmp(CHAR(PRINTNAME(r_expression)), ".") != 0) {
         return nullptr;
     }
 
-    return new WildcardPattern(expression);
+    return new WildcardPattern(r_expression, r_environment);
 }
 
 } // namespace matchr

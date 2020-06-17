@@ -4,12 +4,12 @@
 
 namespace matchr {
 
-RangePattern* RangePattern::create(SEXP expression) {
-    if (TYPEOF(expression) != LANGSXP) {
+RangePattern* RangePattern::create(SEXP r_expression, SEXP r_environment) {
+    if (TYPEOF(r_expression) != LANGSXP) {
         return nullptr;
     }
 
-    SEXP ptr = expression;
+    SEXP ptr = r_expression;
 
     const char* name = CHAR(PRINTNAME(CAR(ptr)));
 
@@ -28,7 +28,7 @@ RangePattern* RangePattern::create(SEXP expression) {
     int min_value = Range::MINIMUM;
     int max_value = Range::MAXIMUM; // std::numeric_limits<int>::max();
 
-    Pattern* sub_pattern = Pattern::create(CAR(ptr));
+    Pattern* sub_pattern = Pattern::create(CAR(ptr), r_environment);
 
     ptr = CDR(ptr);
 
@@ -72,7 +72,8 @@ RangePattern* RangePattern::create(SEXP expression) {
         return nullptr;
     }
 
-    return new RangePattern(expression, sub_pattern, min_value, max_value);
+    return new RangePattern(
+        r_expression, r_environment, sub_pattern, min_value, max_value);
 }
 
 } // namespace matchr

@@ -10,20 +10,27 @@ namespace matchr {
 
 class Pattern: public Object {
   public:
-    explicit Pattern(SEXP r_expression)
+    explicit Pattern(SEXP r_expression, SEXP r_environment)
         : Object()
         , r_expression_(r_expression)
+        , r_environment_(r_environment)
         , identifier_names_()
         , range_(1, 1) {
         R_PreserveObject(r_expression_);
+        R_PreserveObject(r_environment_);
     }
 
     virtual ~Pattern() {
         R_ReleaseObject(r_expression_);
+        R_ReleaseObject(r_environment_);
     }
 
-    SEXP get_expression() {
+    SEXP get_expression() const {
         return r_expression_;
+    }
+
+    SEXP get_environment() const {
+        return r_environment_;
     }
 
     virtual Context match_expression(SEXP expression) const {
@@ -62,10 +69,11 @@ class Pattern: public Object {
 
     static void destroy_sexp(SEXP r_pattern);
 
-    static Pattern* create(SEXP expression);
+    static Pattern* create(SEXP r_expression, SEXP r_environment);
 
   private:
     SEXP r_expression_;
+    SEXP r_environment_;
     IdentifierNames identifier_names_;
     Range range_;
 

@@ -7,7 +7,8 @@ namespace matchr {
 
 class OrSequencePattern: public SequencePattern {
   public:
-    OrSequencePattern(SEXP expression): SequencePattern(expression) {
+    OrSequencePattern(SEXP r_expression, SEXP r_environment)
+        : SequencePattern(r_expression, r_environment) {
     }
 
     Context& match_expression(SEXP expression,
@@ -35,7 +36,7 @@ class OrSequencePattern: public SequencePattern {
         SequencePattern::add_pattern(pattern);
     }
 
-    static OrSequencePattern* create(SEXP expression);
+    static OrSequencePattern* create(SEXP r_expression, SEXP r_environment);
 };
 
 } // namespace matchr

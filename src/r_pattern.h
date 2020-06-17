@@ -3,6 +3,7 @@
 #include <Rdefines.h>
 
 extern "C" {
-SEXP r_pattern_create_pattern(SEXP r_expression);
+SEXP r_pattern_create_pattern(SEXP r_expression, SEXP r_environment);
 SEXP r_pattern_get_expression(SEXP r_pattern);
+SEXP r_pattern_get_environment(SEXP r_pattern);
 }

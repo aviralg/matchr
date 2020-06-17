@@ -8,8 +8,10 @@ namespace matchr {
 
 class IdentifierPattern: public Pattern {
   public:
-    explicit IdentifierPattern(SEXP expression, const std::string name)
-        : Pattern(expression), name_(name) {
+    explicit IdentifierPattern(SEXP r_expression,
+                               SEXP r_environment,
+                               const std::string name)
+        : Pattern(r_expression, r_environment), name_(name) {
         get_identifier_names().add(name);
     }
 
@@ -28,7 +30,7 @@ class IdentifierPattern: public Pattern {
         return context;
     }
 
-    static IdentifierPattern* create(SEXP expression);
+    static IdentifierPattern* create(SEXP r_expression, SEXP r_environment);
 
   private:
     std::string name_;

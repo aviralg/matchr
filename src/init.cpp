@@ -24,8 +24,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"clause_get_evaluand", (DL_FUNC) &r_clause_get_evaluand, 1},
 
     /* pattern */
-    {"pattern_create_pattern", (DL_FUNC) &r_pattern_create_pattern, 1},
+    {"pattern_create_pattern", (DL_FUNC) &r_pattern_create_pattern, 2},
     {"pattern_get_expression", (DL_FUNC) &r_pattern_get_expression, 1},
+    {"pattern_get_environment", (DL_FUNC) &r_pattern_get_environment, 1},
 
     /* evaluand */
     {"evaluand_create_evaluand", (DL_FUNC) &r_evaluand_create_evaluand, 2},

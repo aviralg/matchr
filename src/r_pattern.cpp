@@ -4,8 +4,8 @@
 using matchr::Pattern;
 using matchr::PatternSPtr;
 
-SEXP r_pattern_create_pattern(SEXP r_expression) {
-    Pattern* pattern_ptr = Pattern::create(r_expression);
+SEXP r_pattern_create_pattern(SEXP r_expression, SEXP r_environment) {
+    Pattern* pattern_ptr = Pattern::create(r_expression, r_environment);
     if (pattern_ptr == nullptr) {
         /* TODO: add call expression here  */
         Rf_errorcall(R_NilValue, "unable to create pattern");
@@ -17,4 +17,9 @@ SEXP r_pattern_create_pattern(SEXP r_expression) {
 SEXP r_pattern_get_expression(SEXP r_pattern) {
     PatternSPtr pattern = Pattern::from_sexp(r_pattern);
     return pattern->get_expression();
+}
+
+SEXP r_pattern_get_environment(SEXP r_pattern) {
+    PatternSPtr pattern = Pattern::from_sexp(r_pattern);
+    return pattern->get_environment();
 }
