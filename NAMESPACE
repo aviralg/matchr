@@ -2,6 +2,7 @@
 
 S3method(get_clauses,matchr_matcher)
 S3method(get_environment,matchr_evaluand)
+S3method(get_environment,matchr_pattern)
 S3method(get_evaluand,matchr_clause)
 S3method(get_expression,matchr_evaluand)
 S3method(get_expression,matchr_pattern)
