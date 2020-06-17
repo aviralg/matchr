@@ -4,13 +4,17 @@
 #include "Object.h"
 #include "Context.h"
 #include "IdentifierNames.h"
+#include "Range.h"
 
 namespace matchr {
 
 class Pattern: public Object {
   public:
     explicit Pattern(SEXP r_expression)
-        : Object(), r_expression_(r_expression), identifier_names_() {
+        : Object()
+        , r_expression_(r_expression)
+        , identifier_names_()
+        , range_(1, 1) {
         R_PreserveObject(r_expression_);
     }
 
@@ -38,6 +42,14 @@ class Pattern: public Object {
         return identifier_names_;
     }
 
+    const Range& get_range() const {
+        return range_;
+    }
+
+    Range& get_range() {
+        return range_;
+    }
+
     static void initialize();
 
     static void finalize();
@@ -55,6 +67,7 @@ class Pattern: public Object {
   private:
     SEXP r_expression_;
     IdentifierNames identifier_names_;
+    Range range_;
 
     static SEXP class_;
 };
