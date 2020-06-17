@@ -14,6 +14,13 @@ class Context: public Object {
     explicit Context(bool success): Object(), success_(success) {
     }
 
+    /* TODO: add move assignment and make it efficient */
+    Context& operator=(const Context& context) {
+        bindings_ = context.bindings_;
+        success_ = context.success_;
+        return *this;
+    }
+
     bool is_successful() const {
         return success_;
     }
