@@ -2,6 +2,7 @@
 #include "IdentifierPattern.h"
 #include "WildcardPattern.h"
 #include "AndSequencePattern.h"
+#include "OrSequencePattern.h"
 
 namespace matchr {
 
@@ -58,6 +59,9 @@ Pattern* Pattern::create(SEXP expression) {
         return pattern;
     }
     if (pattern = AndSequencePattern::create(expression)) {
+        return pattern;
+    }
+    if (pattern = OrSequencePattern::create(expression)) {
         return pattern;
     }
 
