@@ -11,7 +11,8 @@ class AndSequencePattern: public SequencePattern {
     }
 
     Context& match_expression(SEXP expression,
-                              Context& context) const override {
+                              Context& context) const override final {
+        context.set_success();
         for (int index = 0; index < get_pattern_count() && context; ++index) {
             const Pattern* pattern = get_pattern(index);
             pattern->match_expression(expression, context);

@@ -20,7 +20,10 @@ class IdentifierPattern: public Pattern {
                               Context& context) const override final {
         if (!context.bind(get_name(), expression)) {
             context.set_failure();
+        } else {
+            context.set_success();
         }
+
         return context;
     }
 

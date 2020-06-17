@@ -13,6 +13,7 @@ class WildcardPattern: public Pattern {
 
     Context& match_expression(SEXP expression,
                               Context& context) const override final {
+        context.set_success();
         return context;
     }
 

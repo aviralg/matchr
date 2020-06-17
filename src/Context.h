@@ -26,6 +26,10 @@ class Context: public Object {
         success_ = false;
     }
 
+    void set_success() {
+        success_ = true;
+    }
+
     operator bool() const {
         return is_successful();
     }
