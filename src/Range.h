@@ -1,6 +1,8 @@
 #ifndef MATCHR_RANGE_H
 #define MATCHR_RANGE_H
 
+#include <algorithm>
+
 namespace matchr {
 
 class Range {
@@ -25,6 +27,11 @@ class Range {
 
     void set_maximum(int maximum) {
         maximum_ = maximum;
+    }
+
+    void add(const Range& range) {
+        minimum_ = std::min(minimum_, range.get_minimum());
+        maximum_ = std::min(maximum_, range.get_maximum());
     }
 
     static const int MINIMUM;

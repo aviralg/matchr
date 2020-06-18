@@ -33,8 +33,6 @@ class IdentifierPattern: public Pattern {
         return IdentifierNames(get_name());
     }
 
-    static IdentifierPattern* create(SEXP r_expression, SEXP r_environment);
-
   private:
     std::string name_;
 };

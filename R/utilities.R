@@ -22,3 +22,47 @@ is_language <- function(object) {
 is_environment <- function(object) {
     is.environment(object)
 }
+
+is_scalar_character <- function(vector) {
+    is.character(vector) && (length(vector) == 1) && (nchar(vector) != 0)
+}
+
+is_vector_character <- function(vector) {
+    is.character(vector)
+}
+
+is_scalar_logical <- function(vector) {
+    is.logical(vector) && (length(vector) == 1)
+}
+
+is_scalar_integer <- function(vector) {
+    is.integer(vector) && (length(vector) == 1)
+}
+
+is_scalar_real <- function(vector) {
+    is.double(vector) && (length(vector) == 1)
+}
+
+is_scalar_complex <- function(vector) {
+    is.complex(vector) && (length(vector) == 1)
+}
+
+is_scalar_raw <- function(vector) {
+    is.raw(vector) && (length(vector) == 1)
+}
+
+is_symbol <- function(object) {
+    is.symbol(object)
+}
+
+is_function <- function(fun) {
+    is.function(fun)
+}
+
+is_null <- function(obj) {
+    is.null(obj)
+}
+
+is_closure <- function(obj) {
+    typeof(obj) == "closure"
+}

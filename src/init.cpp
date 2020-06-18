@@ -24,7 +24,21 @@ static const R_CallMethodDef CallEntries[] = {
     {"clause_get_evaluand", (DL_FUNC) &r_clause_get_evaluand, 1},
 
     /* pattern */
-    {"pattern_create_pattern", (DL_FUNC) &r_pattern_create_pattern, 2},
+    {"pattern_create_wildcard_pattern", (DL_FUNC) &r_pattern_create_wildcard_pattern, 2},
+    {"pattern_create_identifier_pattern", (DL_FUNC) &r_pattern_create_identifier_pattern, 3},
+    {"pattern_create_integer_literal_pattern", (DL_FUNC) &r_pattern_create_integer_literal_pattern, 3},
+    {"pattern_create_real_literal_pattern", (DL_FUNC) &r_pattern_create_real_literal_pattern, 3},
+    {"pattern_create_raw_literal_pattern", (DL_FUNC) &r_pattern_create_raw_literal_pattern, 3},
+    {"pattern_create_string_literal_pattern", (DL_FUNC) &r_pattern_create_string_literal_pattern, 3},
+    {"pattern_create_logical_literal_pattern", (DL_FUNC) &r_pattern_create_logical_literal_pattern, 3},
+    {"pattern_create_complex_literal_pattern", (DL_FUNC) &r_pattern_create_complex_literal_pattern, 3},
+    {"pattern_create_predicate_pattern", (DL_FUNC) &r_pattern_create_predicate_pattern, 3},
+    {"pattern_create_not_unary_pattern", (DL_FUNC) &r_pattern_create_not_unary_pattern, 3},
+    {"pattern_create_group_unary_pattern", (DL_FUNC) &r_pattern_create_group_unary_pattern, 3},
+    {"pattern_create_range_unary_pattern", (DL_FUNC) &r_pattern_create_range_unary_pattern, 3},
+    {"pattern_create_and_binary_pattern", (DL_FUNC) &r_pattern_create_and_binary_pattern, 3},
+    {"pattern_create_or_binary_pattern", (DL_FUNC) &r_pattern_create_or_binary_pattern, 3},
+    {"pattern_create_vector_variadic_pattern", (DL_FUNC) &r_pattern_create_vector_variadic_pattern, 3},
     {"pattern_get_expression", (DL_FUNC) &r_pattern_get_expression, 1},
     {"pattern_get_environment", (DL_FUNC) &r_pattern_get_environment, 1},
 
@@ -40,3 +54,4 @@ void R_init_matchr(DllInfo* dll) {
     R_useDynamicSymbols(dll, FALSE);
 }
 }
+

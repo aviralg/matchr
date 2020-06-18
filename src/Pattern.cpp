@@ -1,12 +1,4 @@
 #include "Pattern.h"
-#include "GroupPattern.h"
-#include "IdentifierPattern.h"
-#include "WildcardPattern.h"
-#include "RangePattern.h"
-#include "PredicatePattern.h"
-#include "AndSequencePattern.h"
-#include "OrSequencePattern.h"
-#include "NotSequencePattern.h"
 
 namespace matchr {
 
@@ -51,37 +43,6 @@ SEXP Pattern::to_sexp(PatternSPtr pattern) {
 void Pattern::destroy_sexp(SEXP r_pattern) {
     delete static_cast<PatternSPtr*>(R_ExternalPtrAddr(r_pattern));
     R_SetExternalPtrAddr(r_pattern, NULL);
-}
-
-Pattern* Pattern::create(SEXP r_expression, SEXP r_environment) {
-    Pattern* pattern = nullptr;
-
-    if (pattern = GroupPattern::create(r_expression, r_environment)) {
-        return pattern;
-    }
-    if (pattern = WildcardPattern::create(r_expression, r_environment)) {
-        return pattern;
-    }
-    if (pattern = IdentifierPattern::create(r_expression, r_environment)) {
-        return pattern;
-    }
-    if (pattern = RangePattern::create(r_expression, r_environment)) {
-        return pattern;
-    }
-    if (pattern = PredicatePattern::create(r_expression, r_environment)) {
-        return pattern;
-    }
-    if (pattern = AndSequencePattern::create(r_expression, r_environment)) {
-        return pattern;
-    }
-    if (pattern = OrSequencePattern::create(r_expression, r_environment)) {
-        return pattern;
-    }
-    if (pattern = NotSequencePattern::create(r_expression, r_environment)) {
-        return pattern;
-    }
-
-    return pattern;
 }
 
 } // namespace matchr

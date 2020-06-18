@@ -62,8 +62,6 @@ class Pattern: public Object {
 
     static void destroy_sexp(SEXP r_pattern);
 
-    static Pattern* create(SEXP r_expression, SEXP r_environment);
-
   private:
     SEXP r_expression_;
     SEXP r_environment_;

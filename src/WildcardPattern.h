@@ -21,8 +21,6 @@ class WildcardPattern: public Pattern {
     IdentifierNames get_identifier_names() const override final {
         return IdentifierNames();
     }
-
-    static WildcardPattern* create(SEXP r_expression, SEXP r_environment);
 };
 
 } // namespace matchr

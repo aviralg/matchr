@@ -37,6 +37,14 @@ class Context: public Object {
         success_ = true;
     }
 
+    void set_status(bool status) {
+        success_ = status;
+    }
+
+    void toggle_status() {
+        success_ = !success_;
+    }
+
     operator bool() const {
         return is_successful();
     }

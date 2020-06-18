@@ -7,18 +7,22 @@ namespace matchr {
 
 class PredicatePattern: public Pattern {
   public:
-    PredicatePattern(SEXP r_expression, SEXP r_environment)
-        : Pattern(r_expression, r_environment) {
+    PredicatePattern(SEXP r_expression, SEXP r_environment, SEXP r_predicate)
+        : Pattern(r_expression, r_environment), r_predicate_(r_predicate) {
     }
 
-    Context& match_expression(SEXP expression,
+    SEXP get_predicate() const {
+        return r_predicate_;
+    }
+
+    Context& match_expression(SEXP r_expression,
                               Context& context) const override final {
         context.set_success();
 
-        SEXP r_predicate = get_expression();
+        SEXP r_predicate = get_predicate();
         SEXP r_environment = get_environment();
         SEXP r_result =
-            Rf_eval(Rf_lang2(r_predicate, expression), r_environment);
+            Rf_eval(Rf_lang2(r_predicate, r_expression), r_environment);
 
         if (TYPEOF(r_result) != LGLSXP || LENGTH(r_result) != 1) {
             /* TODO: raise error  */
@@ -28,9 +32,7 @@ class PredicatePattern: public Pattern {
 
         bool result = asLogical(r_result);
 
-        if (!result) {
-            context.set_failure();
-        }
+        context.set_status(result);
 
         return context;
     }
@@ -39,7 +41,8 @@ class PredicatePattern: public Pattern {
         return IdentifierNames();
     }
 
-    static PredicatePattern* create(SEXP r_expression, SEXP r_environment);
+  private:
+    SEXP r_predicate_;
 };
 
 } // namespace matchr
