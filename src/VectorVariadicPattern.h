@@ -11,32 +11,35 @@ class VectorVariadicPattern: public VariadicPattern {
         : VariadicPattern(r_expression, r_environment) {
     }
 
-    Context& match_value(SEXP r_value, Context& context) const override final {
+    Context match_value(SEXP r_value,
+                        const Context& context) const override final {
+        Context clone(context);
+
         SEXPTYPE type = TYPEOF(r_value);
 
         if (type != INTSXP && type != REALSXP && type != STRSXP &&
             type != LGLSXP && type != RAWSXP && type != CPLXSXP) {
-            context.set_failure();
-            return context;
+            clone.set_failure();
+            return clone;
         }
 
         int length = LENGTH(r_value);
 
         if (get_sub_pattern_count() != length) {
-            context.set_failure();
-            return context;
+            clone.set_failure();
+            return clone;
         }
 
-        context.set_success();
+        clone.set_success();
 
-        for (int index = 0; index < length && context; ++index) {
+        for (int index = 0; index < length && clone; ++index) {
             const PatternSPtr pattern = get_sub_pattern(index);
             SEXP r_element = PROTECT(get_element_(r_value, index));
-            pattern->match_value(r_element, context);
+            clone = pattern->match_value(r_element, clone);
             UNPROTECT(1);
         }
 
-        return context;
+        return clone;
     }
 
     IdentifierNames get_identifier_names() const override final {

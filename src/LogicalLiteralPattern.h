@@ -15,15 +15,18 @@ class LogicalLiteralPattern: public LiteralPattern {
         return value_;
     }
 
-    Context& match_value(SEXP r_value, Context& context) const override final {
+    Context match_value(SEXP r_value,
+                        const Context& context) const override final {
+        Context clone(context);
+
         if (TYPEOF(r_value) != LGLSXP || LENGTH(r_value) != 1) {
-            context.set_failure();
-            return context;
+            clone.set_failure();
+            return clone;
         }
 
-        context.set_status(asLogical(r_value) == get_value());
+        clone.set_status(asLogical(r_value) == get_value());
 
-        return context;
+        return clone;
     }
 
   private:

@@ -37,7 +37,7 @@ class Pattern: public Object {
         return match_value(r_value, context);
     }
 
-    virtual Context& match_value(SEXP r_value, Context& context) const = 0;
+    virtual Context match_value(SEXP r_value, const Context& context) const = 0;
 
     virtual IdentifierNames get_identifier_names() const = 0;
 

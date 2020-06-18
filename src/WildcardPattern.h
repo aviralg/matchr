@@ -12,9 +12,13 @@ class WildcardPattern: public Pattern {
         : Pattern(r_expression, r_environment) {
     }
 
-    Context& match_value(SEXP r_value, Context& context) const override final {
-        context.set_success();
-        return context;
+    Context match_value(SEXP r_value,
+                        const Context& context) const override final {
+        Context clone(context);
+
+        clone.set_success();
+
+        return clone;
     }
 
     IdentifierNames get_identifier_names() const override final {

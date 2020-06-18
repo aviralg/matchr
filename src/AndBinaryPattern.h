@@ -17,16 +17,19 @@ class AndBinaryPattern: public BinaryPattern {
                         second_sub_pattern) {
     }
 
-    Context& match_value(SEXP r_value, Context& context) const override final {
-        context.set_success();
+    Context match_value(SEXP r_value,
+                        const Context& context) const override final {
+        Context clone(context);
 
-        get_first_sub_pattern()->match_value(r_value, context);
+        clone.set_success();
 
-        if (context) {
-            get_second_sub_pattern()->match_value(r_value, context);
+        clone = get_first_sub_pattern()->match_value(r_value, clone);
+
+        if (clone) {
+            clone = get_second_sub_pattern()->match_value(r_value, clone);
         }
 
-        return context;
+        return clone;
     }
 
     IdentifierNames get_identifier_names() const override final {

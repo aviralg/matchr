@@ -18,14 +18,13 @@ class IdentifierPattern: public Pattern {
         return name_;
     }
 
-    Context& match_value(SEXP r_value, Context& context) const override final {
-        if (!context.bind(get_name(), r_value)) {
-            context.set_failure();
-        } else {
-            context.set_success();
-        }
+    Context match_value(SEXP r_value,
+                        const Context& context) const override final {
+        Context clone(context);
 
-        return context;
+        clone.set_status(clone.bind(get_name(), r_value));
+
+        return clone;
     }
 
     IdentifierNames get_identifier_names() const override final {

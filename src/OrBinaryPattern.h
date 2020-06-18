@@ -17,18 +17,15 @@ class OrBinaryPattern: public BinaryPattern {
                         second_sub_pattern) {
     }
 
-    Context& match_value(SEXP r_value, Context& context) const override final {
-        context.set_failure();
-
-        Context clone = context;
-
-        get_first_sub_pattern()->match_value(r_value, clone);
+    Context match_value(SEXP r_value,
+                        const Context& context) const override final {
+        Context clone = get_first_sub_pattern()->match_value(r_value, context);
 
         if (!clone) {
-            get_second_sub_pattern()->match_value(r_value, context);
+            clone = get_second_sub_pattern()->match_value(r_value, context);
         }
 
-        return context;
+        return clone;
     }
 
     IdentifierNames get_identifier_names() const override final {

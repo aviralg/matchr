@@ -15,24 +15,20 @@ class PredicatePattern: public Pattern {
         return r_predicate_;
     }
 
-    Context& match_value(SEXP r_value, Context& context) const override final {
-        context.set_success();
+    Context match_value(SEXP r_value,
+                        const Context& context) const override final {
+        Context clone(context);
 
         SEXP r_predicate = get_predicate();
         SEXP r_environment = get_environment();
         SEXP r_result = Rf_eval(Rf_lang2(r_predicate, r_value), r_environment);
 
-        if (TYPEOF(r_result) != LGLSXP || LENGTH(r_result) != 1) {
-            /* TODO: raise error  */
-            context.set_failure();
-            return context;
-        }
+        bool status = TYPEOF(r_result) == LGLSXP && LENGTH(r_result) == 1 &&
+                      asLogical(r_result);
 
-        bool result = asLogical(r_result);
+        clone.set_status(status);
 
-        context.set_status(result);
-
-        return context;
+        return clone;
     }
 
     IdentifierNames get_identifier_names() const override final {

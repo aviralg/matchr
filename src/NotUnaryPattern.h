@@ -13,14 +13,17 @@ class NotUnaryPattern: public UnaryPattern {
         : UnaryPattern(r_expression, r_environment, sub_pattern) {
     }
 
-    Context& match_value(SEXP r_value, Context& context) const override final {
-        context.set_success();
+    Context match_value(SEXP r_value,
+                        const Context& context) const override final {
+        Context clone(context);
 
-        get_sub_pattern()->match_value(r_value, context);
+        clone.set_success();
 
-        context.toggle_status();
+        clone = get_sub_pattern()->match_value(r_value, clone);
 
-        return context;
+        clone.toggle_status();
+
+        return clone;
     }
 
     IdentifierNames get_identifier_names() const override final {
