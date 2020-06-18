@@ -14,9 +14,8 @@ class GroupUnaryPattern: public UnaryPattern {
         : UnaryPattern(r_expression, r_environment, sub_pattern) {
     }
 
-    Context& match_expression(SEXP expression,
-                              Context& context) const override final {
-        return get_sub_pattern()->match_expression(expression, context);
+    Context& match_value(SEXP r_value, Context& context) const override final {
+        return get_sub_pattern()->match_value(r_value, context);
     }
 
     IdentifierNames get_identifier_names() const override final {

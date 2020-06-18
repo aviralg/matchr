@@ -15,14 +15,13 @@ class RealLiteralPattern: public LiteralPattern {
         return value_;
     }
 
-    Context& match_expression(SEXP r_expression,
-                              Context& context) const override final {
-        if (TYPEOF(r_expression) != REALSXP || LENGTH(r_expression) != 1) {
+    Context& match_value(SEXP r_value, Context& context) const override final {
+        if (TYPEOF(r_value) != REALSXP || LENGTH(r_value) != 1) {
             context.set_failure();
             return context;
         }
 
-        context.set_status(asReal(r_expression) == get_value());
+        context.set_status(asReal(r_value) == get_value());
 
         return context;
     }

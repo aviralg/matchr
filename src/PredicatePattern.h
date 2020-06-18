@@ -15,14 +15,12 @@ class PredicatePattern: public Pattern {
         return r_predicate_;
     }
 
-    Context& match_expression(SEXP r_expression,
-                              Context& context) const override final {
+    Context& match_value(SEXP r_value, Context& context) const override final {
         context.set_success();
 
         SEXP r_predicate = get_predicate();
         SEXP r_environment = get_environment();
-        SEXP r_result =
-            Rf_eval(Rf_lang2(r_predicate, r_expression), r_environment);
+        SEXP r_result = Rf_eval(Rf_lang2(r_predicate, r_value), r_environment);
 
         if (TYPEOF(r_result) != LGLSXP || LENGTH(r_result) != 1) {
             /* TODO: raise error  */

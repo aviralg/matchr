@@ -11,9 +11,8 @@ class VectorVariadicPattern: public VariadicPattern {
         : VariadicPattern(r_expression, r_environment) {
     }
 
-    Context& match_expression(SEXP r_expression,
-                              Context& context) const override final {
-        SEXPTYPE type = TYPEOF(r_expression);
+    Context& match_value(SEXP r_value, Context& context) const override final {
+        SEXPTYPE type = TYPEOF(r_value);
 
         if (type != INTSXP && type != REALSXP && type != STRSXP &&
             type != LGLSXP && type != RAWSXP && type != CPLXSXP) {
@@ -21,7 +20,7 @@ class VectorVariadicPattern: public VariadicPattern {
             return context;
         }
 
-        int length = LENGTH(r_expression);
+        int length = LENGTH(r_value);
 
         if (get_sub_pattern_count() != length) {
             context.set_failure();
@@ -32,8 +31,8 @@ class VectorVariadicPattern: public VariadicPattern {
 
         for (int index = 0; index < length && context; ++index) {
             const PatternSPtr pattern = get_sub_pattern(index);
-            SEXP r_element = PROTECT(get_element_(r_expression, index));
-            pattern->match_expression(r_element, context);
+            SEXP r_element = PROTECT(get_element_(r_value, index));
+            pattern->match_value(r_element, context);
             UNPROTECT(1);
         }
 
@@ -50,22 +49,22 @@ class VectorVariadicPattern: public VariadicPattern {
     }
 
   private:
-    SEXP get_element_(SEXP r_expression, int index) const {
-        switch (TYPEOF(r_expression)) {
+    SEXP get_element_(SEXP r_value, int index) const {
+        switch (TYPEOF(r_value)) {
         case INTSXP:
-            return ScalarInteger(INTEGER(r_expression)[index]);
+            return ScalarInteger(INTEGER(r_value)[index]);
             break;
 
         case REALSXP:
-            return ScalarReal(REAL(r_expression)[index]);
+            return ScalarReal(REAL(r_value)[index]);
             break;
 
         case STRSXP:
-            return mkString(CHAR(STRING_ELT(r_expression, index)));
+            return mkString(CHAR(STRING_ELT(r_value, index)));
             break;
 
         case LGLSXP:
-            return ScalarLogical(LOGICAL(r_expression)[index]);
+            return ScalarLogical(LOGICAL(r_value)[index]);
             break;
         }
 

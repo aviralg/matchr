@@ -17,14 +17,13 @@ class StringLiteralPattern: public LiteralPattern {
         return value_;
     }
 
-    Context& match_expression(SEXP r_expression,
-                              Context& context) const override final {
-        if (TYPEOF(r_expression) != STRSXP || LENGTH(r_expression) != 1) {
+    Context& match_value(SEXP r_value, Context& context) const override final {
+        if (TYPEOF(r_value) != STRSXP || LENGTH(r_value) != 1) {
             context.set_failure();
             return context;
         }
 
-        context.set_status(get_value() == CHAR(asChar(r_expression)));
+        context.set_status(get_value() == CHAR(asChar(r_value)));
 
         return context;
     }

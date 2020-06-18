@@ -24,8 +24,8 @@ class Clause: public Object {
         return evaluand_;
     }
 
-    Context match_expression(SEXP expression) {
-        return get_pattern()->match_expression(expression);
+    Context match_value(SEXP r_value) {
+        return get_pattern()->match_value(r_value);
     }
 
     SEXP evaluate_expression(Context context) {

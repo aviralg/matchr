@@ -23,10 +23,10 @@ class Matcher: public Object {
         return clauses_[index];
     }
 
-    SEXP match_expression(SEXP expression) {
+    SEXP match_value(SEXP r_value) {
         for (int index = 0; index < get_clause_count(); ++index) {
             ClauseSPtr clause = get_clause(index);
-            Context context = clause->match_expression(expression);
+            Context context = clause->match_value(r_value);
             if (context) {
                 return clause->evaluate_expression(context);
             }

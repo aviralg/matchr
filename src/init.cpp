@@ -16,7 +16,7 @@ static const R_CallMethodDef CallEntries[] = {
     /* matcher */
     {"matcher_create_matcher", (DL_FUNC) &r_matcher_create_matcher, 1},
     {"matcher_get_clauses", (DL_FUNC) &r_matcher_get_clauses, 1},
-    {"matcher_match_expression", (DL_FUNC) &r_matcher_match_expression, 2},
+    {"matcher_match_value", (DL_FUNC) &r_matcher_match_value, 2},
 
     /* clause */
     {"clause_create_clause", (DL_FUNC) &r_clause_create_clause, 2},

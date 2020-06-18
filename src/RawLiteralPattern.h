@@ -15,14 +15,13 @@ class RawLiteralPattern: public LiteralPattern {
         return value_;
     }
 
-    Context& match_expression(SEXP r_expression,
-                              Context& context) const override final {
-        if (TYPEOF(r_expression) != RAWSXP || LENGTH(r_expression) != 1) {
+    Context& match_value(SEXP r_value, Context& context) const override final {
+        if (TYPEOF(r_value) != RAWSXP || LENGTH(r_value) != 1) {
             context.set_failure();
             return context;
         }
 
-        context.set_status(RAW_ELT(r_expression, 0) == get_value());
+        context.set_status(RAW_ELT(r_value, 0) == get_value());
 
         return context;
     }

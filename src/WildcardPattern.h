@@ -12,8 +12,7 @@ class WildcardPattern: public Pattern {
         : Pattern(r_expression, r_environment) {
     }
 
-    Context& match_expression(SEXP expression,
-                              Context& context) const override final {
+    Context& match_value(SEXP r_value, Context& context) const override final {
         context.set_success();
         return context;
     }

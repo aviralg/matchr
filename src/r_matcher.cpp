@@ -34,7 +34,7 @@ SEXP r_matcher_get_clauses(SEXP r_matcher) {
     return r_clauses;
 }
 
-SEXP r_matcher_match_expression(SEXP r_matcher, SEXP r_expression) {
+SEXP r_matcher_match_value(SEXP r_matcher, SEXP r_value) {
     MatcherSPtr matcher = Matcher::from_sexp(r_matcher);
-    return matcher->match_expression(r_expression);
+    return matcher->match_value(r_value);
 }

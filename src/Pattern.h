@@ -32,13 +32,12 @@ class Pattern: public Object {
         return r_environment_;
     }
 
-    virtual Context match_expression(SEXP expression) const {
+    virtual Context match_value(SEXP r_value) const {
         Context context(true);
-        return match_expression(expression, context);
+        return match_value(r_value, context);
     }
 
-    virtual Context& match_expression(SEXP expression,
-                                      Context& context) const = 0;
+    virtual Context& match_value(SEXP r_value, Context& context) const = 0;
 
     virtual IdentifierNames get_identifier_names() const = 0;
 

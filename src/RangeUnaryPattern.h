@@ -18,8 +18,7 @@ class RangeUnaryPattern: public UnaryPattern {
         get_range().set_maximum(maximum);
     }
 
-    Context& match_expression(SEXP expression,
-                              Context& context) const override final {
+    Context& match_value(SEXP r_value, Context& context) const override final {
         /* TODO: implement matching correctly  */
         context.set_success();
         return context;

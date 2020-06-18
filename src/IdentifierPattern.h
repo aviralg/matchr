@@ -18,9 +18,8 @@ class IdentifierPattern: public Pattern {
         return name_;
     }
 
-    Context& match_expression(SEXP expression,
-                              Context& context) const override final {
-        if (!context.bind(get_name(), expression)) {
+    Context& match_value(SEXP r_value, Context& context) const override final {
+        if (!context.bind(get_name(), r_value)) {
             context.set_failure();
         } else {
             context.set_success();

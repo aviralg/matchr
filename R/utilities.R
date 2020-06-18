@@ -23,6 +23,10 @@ is_environment <- function(object) {
     is.environment(object)
 }
 
+is_character <- function(vector) {
+    is.character(vector)
+}
+
 is_scalar_character <- function(vector) {
     is.character(vector) && (length(vector) == 1) && (nchar(vector) != 0)
 }
@@ -73,4 +77,13 @@ is_null <- function(obj) {
 
 is_closure <- function(obj) {
     typeof(obj) == "closure"
+}
+
+## parse the file contents as an expression
+## and coerce it to a list of language objects
+parse_file <- function(filename) {
+
+    is_scalar_character(filename)
+
+    as.list(parse(file = filename))
 }

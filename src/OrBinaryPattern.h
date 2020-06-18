@@ -17,16 +17,15 @@ class OrBinaryPattern: public BinaryPattern {
                         second_sub_pattern) {
     }
 
-    Context& match_expression(SEXP expression,
-                              Context& context) const override final {
+    Context& match_value(SEXP r_value, Context& context) const override final {
         context.set_failure();
 
         Context clone = context;
 
-        get_first_sub_pattern()->match_expression(expression, clone);
+        get_first_sub_pattern()->match_value(r_value, clone);
 
         if (!clone) {
-            get_second_sub_pattern()->match_expression(expression, context);
+            get_second_sub_pattern()->match_value(r_value, context);
         }
 
         return context;
