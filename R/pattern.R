@@ -115,6 +115,17 @@ create_pattern <- function(expression, environment) {
 
             right_sub_pattern <- create_pattern(expression[[3]], environment)
 
+            left_identifier_names <- .Call(C_pattern_get_identifier_names, left_sub_pattern)
+
+            right_identifier_names <- .Call(C_pattern_get_identifier_names, right_sub_pattern)
+
+            if(length(setdiff(left_identifier_names, right_identifier_names)) != 0) {
+                message <- sprintf("sub patterns '%s' and '%s' of || should introduce same bindings",
+                                   expr_to_string(expression[[2]]),
+                                   expr_to_string(expression[[3]]))
+                stop(message)
+            }
+
             .Call(C_pattern_create_or_binary_pattern, expression, environment, left_sub_pattern, right_sub_pattern)
         }
 
