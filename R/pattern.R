@@ -47,10 +47,6 @@ create_pattern <- function(expression, environment) {
         .Call(C_pattern_create_real_literal_pattern, expression, environment, expression)
     }
 
-    else if (is_scalar_raw(expression)) {
-        .Call(C_pattern_create_raw_literal_pattern, expression, environment, expression)
-    }
-
     else if (is_scalar_character(expression)) {
         .Call(C_pattern_create_string_literal_pattern, expression, environment, expression)
     }
@@ -69,9 +65,13 @@ create_pattern <- function(expression, environment) {
 
         argument_count <- length(expression) - 1
 
+        if (function_name == "raw" && argument_count == 1 && is_scalar_raw_coercible(expression[[2]])) {
+            .Call(C_pattern_create_raw_literal_pattern, expression, environment, as.raw(expression[[2]]))
+        }
+
         ## NULLARY PATTERNS
 
-        if (function_name == "predicate" && argument_count == 1) {
+        else if (function_name == "predicate" && argument_count == 1) {
             predicate <- expression[[2]]
 
             .Call(C_pattern_create_predicate_pattern, expression, environment, predicate)
