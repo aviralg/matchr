@@ -20,7 +20,7 @@ class ComplexLiteralPattern: public LiteralPattern {
 
     Context& match_expression(SEXP r_expression,
                               Context& context) const override final {
-        if (TYPEOF(r_expression) != CPLXSXP && LENGTH(r_expression) != 1) {
+        if (TYPEOF(r_expression) != CPLXSXP || LENGTH(r_expression) != 1) {
             context.set_failure();
             return context;
         }
