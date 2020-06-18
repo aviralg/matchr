@@ -52,4 +52,5 @@ SEXP r_pattern_create_vector_variadic_pattern(SEXP r_expression,
                                               SEXP r_sub_patterns);
 SEXP r_pattern_get_expression(SEXP r_pattern);
 SEXP r_pattern_get_environment(SEXP r_pattern);
+SEXP r_pattern_get_identifier_names(SEXP r_pattern);
 }

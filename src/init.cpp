@@ -41,6 +41,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"pattern_create_vector_variadic_pattern", (DL_FUNC) &r_pattern_create_vector_variadic_pattern, 3},
     {"pattern_get_expression", (DL_FUNC) &r_pattern_get_expression, 1},
     {"pattern_get_environment", (DL_FUNC) &r_pattern_get_environment, 1},
+    {"pattern_get_identifier_names", (DL_FUNC) &r_pattern_get_identifier_names, 1},
 
     /* evaluand */
     {"evaluand_create_evaluand", (DL_FUNC) &r_evaluand_create_evaluand, 2},

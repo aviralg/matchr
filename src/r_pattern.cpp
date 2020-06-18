@@ -19,6 +19,7 @@
 using matchr::AndBinaryPattern;
 using matchr::ComplexLiteralPattern;
 using matchr::GroupUnaryPattern;
+using matchr::IdentifierNames;
 using matchr::IdentifierPattern;
 using matchr::IntegerLiteralPattern;
 using matchr::LogicalLiteralPattern;
@@ -189,4 +190,23 @@ SEXP r_pattern_get_expression(SEXP r_pattern) {
 SEXP r_pattern_get_environment(SEXP r_pattern) {
     PatternSPtr pattern = Pattern::from_sexp(r_pattern);
     return pattern->get_environment();
+}
+
+SEXP r_pattern_get_identifier_names(SEXP r_pattern) {
+    PatternSPtr pattern = Pattern::from_sexp(r_pattern);
+    IdentifierNames identifier_names = pattern->get_identifier_names();
+
+    int count = identifier_names.get_count();
+
+    SEXP r_identifier_names = PROTECT(allocVector(STRSXP, count));
+
+    for (int index = 0; index < count; ++index) {
+        SET_STRING_ELT(r_identifier_names,
+                       index,
+                       mkChar(identifier_names.get_name(index).c_str()));
+    }
+
+    UNPROTECT(1);
+
+    return r_identifier_names;
 }
