@@ -55,10 +55,6 @@ create_pattern <- function(expression, environment) {
         .Call(C_pattern_create_logical_literal_pattern, expression, environment, expression)
     }
 
-    else if (is_scalar_complex(expression)) {
-        .Call(C_pattern_create_complex_literal_pattern, expression, environment, expression)
-    }
-
     else if (is_language(expression)) {
 
         function_name <- as.character(expression[[1]])
@@ -67,6 +63,11 @@ create_pattern <- function(expression, environment) {
 
         if (function_name == "raw" && argument_count == 1 && is_scalar_raw_coercible(expression[[2]])) {
             .Call(C_pattern_create_raw_literal_pattern, expression, environment, as.raw(expression[[2]]))
+        }
+
+        else if (function_name == "+" && argument_count == 2 && is_numeric(expression[[2]]) && is_scalar_complex(expression[[3]])) {
+            value <- expression[[2]] + expression[[3]]
+            .Call(C_pattern_create_complex_literal_pattern, expression, environment, value)
         }
 
         ## NULLARY PATTERNS

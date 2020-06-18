@@ -51,6 +51,10 @@ is_scalar_raw <- function(vector) {
     is.raw(vector) && (length(vector) == 1)
 }
 
+is_numeric <- function(vector) {
+    is.numeric(vector)
+}
+
 is_scalar_raw_coercible <- function(value) {
     is.numeric(value) && length(value) == 1 && value >= 0 && value <= 255
 }
