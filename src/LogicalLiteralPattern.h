@@ -19,12 +19,11 @@ class LogicalLiteralPattern: public LiteralPattern {
                         const Context& context) const override final {
         Context clone(context);
 
-        if (TYPEOF(r_value) != LGLSXP || LENGTH(r_value) != 1) {
-            clone.set_failure();
-            return clone;
-        }
+        bool status =
+            TYPEOF(r_value) == LGLSXP &&
+            LOGICAL(r_value)[clone.get_range().get_minimum()] == get_value();
 
-        clone.set_status(asLogical(r_value) == get_value());
+        clone.set_status(status);
 
         return clone;
     }

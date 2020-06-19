@@ -19,12 +19,11 @@ class IntegerLiteralPattern: public LiteralPattern {
                         const Context& context) const override final {
         Context clone(context);
 
-        if (TYPEOF(r_value) != INTSXP || LENGTH(r_value) != 1) {
-            clone.set_failure();
-            return clone;
-        }
+        bool status =
+            TYPEOF(r_value) == INTSXP &&
+            INTEGER(r_value)[clone.get_range().get_minimum()] == get_value();
 
-        clone.set_status(asInteger(r_value) == get_value());
+        clone.set_status(status);
 
         return clone;
     }

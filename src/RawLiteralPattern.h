@@ -19,12 +19,11 @@ class RawLiteralPattern: public LiteralPattern {
                         const Context& context) const override final {
         Context clone(context);
 
-        if (TYPEOF(r_value) != RAWSXP || LENGTH(r_value) != 1) {
-            clone.set_failure();
-            return clone;
-        }
+        bool status =
+            TYPEOF(r_value) == RAWSXP &&
+            RAW_ELT(r_value, clone.get_range().get_minimum()) == get_value();
 
-        clone.set_status(RAW_ELT(r_value, 0) == get_value());
+        clone.set_status(status);
 
         return clone;
     }

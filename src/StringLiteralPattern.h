@@ -21,12 +21,12 @@ class StringLiteralPattern: public LiteralPattern {
                         const Context& context) const override final {
         Context clone(context);
 
-        if (TYPEOF(r_value) != STRSXP || LENGTH(r_value) != 1) {
-            clone.set_failure();
-            return clone;
-        }
+        bool status =
+            TYPEOF(r_value) == STRSXP &&
+            get_value() ==
+                CHAR(STRING_ELT(r_value, clone.get_range().get_minimum()));
 
-        clone.set_status(get_value() == CHAR(asChar(r_value)));
+        clone.set_status(status);
 
         return clone;
     }

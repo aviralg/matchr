@@ -19,12 +19,11 @@ class RealLiteralPattern: public LiteralPattern {
                         const Context& context) const override final {
         Context clone(context);
 
-        if (TYPEOF(r_value) != REALSXP || LENGTH(r_value) != 1) {
-            clone.set_failure();
-            return clone;
-        }
+        bool status =
+            TYPEOF(r_value) == REALSXP &&
+            REAL(r_value)[clone.get_range().get_minimum()] == get_value();
 
-        clone.set_status(asReal(r_value) == get_value());
+        clone.set_status(status);
 
         return clone;
     }

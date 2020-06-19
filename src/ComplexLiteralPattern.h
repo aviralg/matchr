@@ -18,18 +18,20 @@ class ComplexLiteralPattern: public LiteralPattern {
         return value_;
     }
 
+    bool is_equal(const Rcomplex& rhs) const {
+        const Rcomplex& lhs = get_value();
+        return lhs.r == rhs.r && lhs.i == rhs.i;
+    }
+
     Context match_value(SEXP r_value,
                         const Context& context) const override final {
         Context clone(context);
 
-        if (TYPEOF(r_value) != CPLXSXP || LENGTH(r_value) != 1) {
-            clone.set_failure();
-            return clone;
-        }
+        bool status =
+            TYPEOF(r_value) == CPLXSXP &&
+            is_equal(COMPLEX_ELT(r_value, clone.get_range().get_minimum()));
 
-        Rcomplex value1 = get_value();
-        Rcomplex value2 = COMPLEX_ELT(r_value, 0);
-        clone.set_status(value1.r == value2.r && value1.i == value2.i);
+        clone.set_status(status);
 
         return clone;
     }

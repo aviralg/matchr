@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include "equality.h"
+#include "Range.h"
 
 namespace matchr {
 
@@ -49,20 +50,27 @@ class Context: public Object {
         return is_successful();
     }
 
-    bool bind(const std::string identifier, SEXP expression) {
+    const Range& get_range() const {
+        return range_;
+    }
+
+    Range& get_range() {
+        return range_;
+    }
+
+    void bind(const std::string& identifier, SEXP r_expression) {
+        bindings_[identifier] = r_expression;
+    }
+
+    SEXP lookup(const std::string identifier) {
         auto iter = bindings_.find(identifier);
 
-        /* if this identifier is already bound to an expression, then compare
-         * that for equality with the argument expression  */
-        if (iter != bindings_.end()) {
-            SEXP bound_expression = iter->second;
-            return is_equal(bound_expression, expression);
+        if (iter == bindings_.end()) {
+            Rf_errorcall(
+                R_NilValue, "%s not bound in context", identifier.c_str());
         }
 
-        /* add binding if identifier is not already bound */
-        bindings_.insert({identifier, expression});
-
-        return true;
+        return iter->second;
     }
 
     SEXP as_environment(SEXP parent) {
@@ -84,6 +92,7 @@ class Context: public Object {
   private:
     std::unordered_map<std::string, SEXP> bindings_;
     bool success_;
+    Range range_;
 };
 
 } // namespace matchr
