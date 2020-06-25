@@ -12,7 +12,7 @@ namespace matchr {
 
 class Context: public Object {
   public:
-    explicit Context(bool success): Object(), success_(success) {
+    explicit Context(bool success): Object(), success_(success), range_(0, 0) {
     }
 
     /* TODO: add move assignment and make it efficient */

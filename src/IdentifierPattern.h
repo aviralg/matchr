@@ -22,7 +22,9 @@ class IdentifierPattern: public Pattern {
                         const Context& context) const override final {
         Context clone(context);
 
-        clone.set_status(clone.bind(get_name(), r_value));
+        clone.bind(get_name(), r_value);
+
+        clone.set_status(true);
 
         return clone;
     }

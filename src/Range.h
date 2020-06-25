@@ -29,6 +29,15 @@ class Range {
         maximum_ = maximum;
     }
 
+    void set(int minimum, int maximum) {
+        set_minimum(minimum);
+        set_maximum(maximum);
+    }
+
+    void set(int value) {
+        set(value, value);
+    }
+
     void add(const Range& range) {
         minimum_ = std::min(minimum_, range.get_minimum());
         maximum_ = std::min(maximum_, range.get_maximum());
