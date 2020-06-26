@@ -10,5 +10,6 @@ void initialize_utilities(SEXP r_package_environment) {
 }
 
 SEXP new_dot_env(SEXP hash, SEXP parent, SEXP size) {
-    return Rf_eval(Rf_lang4(NewDotEnvSymbol, hash, parent, size), PackageEnvironment);
+    return Rf_eval(Rf_lang4(NewDotEnvSymbol, hash, parent, size),
+                   PackageEnvironment);
 }
