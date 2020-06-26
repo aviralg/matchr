@@ -147,6 +147,10 @@ bool equal_string_vectors(SEXP str1, SEXP str2) {
 }
 
 bool is_equal(SEXP value1, SEXP value2) {
+    if (value1 == value2) {
+        return true;
+    }
+
     if (TYPEOF(value1) != TYPEOF(value2)) {
         return false;
     }
