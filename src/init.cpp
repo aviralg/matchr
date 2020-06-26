@@ -3,6 +3,7 @@
 #include "r_clause.h"
 #include "r_pattern.h"
 #include "r_evaluand.h"
+#include "r_utilities.h"
 
 #include <R_ext/Rdynload.h>
 #include <stdio.h>
@@ -47,6 +48,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"evaluand_create_evaluand", (DL_FUNC) &r_evaluand_create_evaluand, 2},
     {"evaluand_get_expression", (DL_FUNC) &r_evaluand_get_expression, 1},
     {"evaluand_get_environment", (DL_FUNC) &r_evaluand_get_environment, 1},
+
+    /* utilities */
+    {"utilities_parse_identifier", (DL_FUNC) &r_utilities_parse_identifier, 1},
 
     {NULL, NULL, 0}};
 
