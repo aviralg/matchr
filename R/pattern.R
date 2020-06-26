@@ -52,7 +52,7 @@ create_pattern <- function(expression, environment, parents) {
 
         if (type == "identifier") {
             if(identifier == ".") {
-                .Call(C_pattern_create_wildcard_pattern, expression, environment, identifier)
+                .Call(C_pattern_create_wildcard_pattern, expression, environment)
             }
             else {
                 .Call(C_pattern_create_identifier_pattern, expression, environment, identifier)
