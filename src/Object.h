@@ -1,9 +1,9 @@
 #ifndef MATCHR_OBJECT_H
 #define MATCHR_OBJECT_H
 
-#include <Rinternals.h>
-#include <memory>
 #include <string>
+#include "r.h"
+#include <memory>
 
 namespace matchr {
 

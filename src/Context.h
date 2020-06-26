@@ -1,12 +1,12 @@
 #ifndef MATCHR_CONTEXT_H
 #define MATCHR_CONTEXT_H
 
-#include "Object.h"
-#include "utilities.h"
 #include <string>
 #include <unordered_map>
 #include "equality.h"
 #include "Range.h"
+#include "Object.h"
+#include "utilities.h"
 
 namespace matchr {
 

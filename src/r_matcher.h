@@ -1,6 +1,4 @@
-#include <R.h>
-#include <R_ext/Error.h>
-#include <Rdefines.h>
+#include "r.h"
 
 extern "C" {
 SEXP r_matcher_create_matcher(SEXP r_clauses);

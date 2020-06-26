@@ -1,6 +1,6 @@
-#include "equality.h"
-#include <R_ext/Complex.h>
 #include <cstring>
+#include "equality.h"
+#include "r.h"
 
 bool equal_symbols(SEXP symbol1, SEXP symbol2) {
     return !strcmp(CHAR(PRINTNAME(symbol1)), CHAR(PRINTNAME(symbol2)));

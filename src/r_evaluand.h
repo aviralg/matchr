@@ -1,6 +1,5 @@
-#include <R.h>
-#include <R_ext/Error.h>
-#include <Rdefines.h>
+
+#include "r.h"
 
 extern "C" {
 SEXP r_evaluand_create_evaluand(SEXP r_expression, SEXP r_environment);

@@ -1,6 +1,5 @@
-#include <R.h>
-#include <R_ext/Error.h>
-#include <Rdefines.h>
+
+#include "r.h"
 
 extern "C" {
 SEXP r_clause_create_clause(SEXP r_pattern, SEXP r_evaluand);

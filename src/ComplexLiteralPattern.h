@@ -2,7 +2,7 @@
 #define MATCHR_COMPLEX_LITERAL_PATTERN_H
 
 #include "LiteralPattern.h"
-#include <R_ext/Complex.h>
+#include "r.h"
 
 namespace matchr {
 
