@@ -1,8 +1,8 @@
 #ifndef MATCHR_OBJECT_H
 #define MATCHR_OBJECT_H
 
-#include <string>
 #include "r.h"
+#include <string>
 #include <memory>
 
 namespace matchr {
