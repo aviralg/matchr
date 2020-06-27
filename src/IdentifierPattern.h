@@ -18,11 +18,11 @@ class IdentifierPattern: public Pattern {
         return name_;
     }
 
-    Context match_value(SEXP r_value,
+    Context match_value(RValue value,
                         const Context& context) const override final {
         Context clone(context);
 
-        clone.bind(get_name(), r_value);
+        clone.get_bindings().bind(get_name(), value.get_value());
 
         clone.set_status(true);
 

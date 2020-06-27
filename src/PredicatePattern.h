@@ -15,16 +15,17 @@ class PredicatePattern: public Pattern {
         return r_predicate_;
     }
 
-    Context match_value(SEXP r_value,
+    Context match_value(RValue value,
                         const Context& context) const override final {
         Context clone(context);
 
         SEXP r_predicate = get_predicate();
         SEXP r_environment = get_environment();
-        SEXP r_result = Rf_eval(Rf_lang2(r_predicate, r_value), r_environment);
+        RValue result =
+            Rf_eval(Rf_lang2(r_predicate, value.get_value()), r_environment);
 
-        bool status = TYPEOF(r_result) == LGLSXP && LENGTH(r_result) == 1 &&
-                      asLogical(r_result);
+        bool status =
+            result.is_logical_literal() && result.get_logical_element(0);
 
         clone.set_status(status);
 

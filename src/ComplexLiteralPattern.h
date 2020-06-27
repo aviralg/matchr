@@ -23,13 +23,12 @@ class ComplexLiteralPattern: public LiteralPattern {
         return lhs.r == rhs.r && lhs.i == rhs.i;
     }
 
-    Context match_value(SEXP r_value,
+    Context match_value(RValue value,
                         const Context& context) const override final {
         Context clone(context);
 
         bool status =
-            TYPEOF(r_value) == CPLXSXP &&
-            is_equal(COMPLEX_ELT(r_value, clone.get_range().get_minimum()));
+            value.is_complex_vector() && value.has_complex_value(get_value());
 
         clone.set_status(status);
 

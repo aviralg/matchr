@@ -17,9 +17,9 @@ SEXP r_pattern_create_real_literal_pattern(SEXP r_expression,
 SEXP r_pattern_create_raw_literal_pattern(SEXP r_expression,
                                           SEXP r_environment,
                                           SEXP r_value);
-SEXP r_pattern_create_string_literal_pattern(SEXP r_expression,
-                                             SEXP r_environment,
-                                             SEXP r_value);
+SEXP r_pattern_create_character_literal_pattern(SEXP r_expression,
+                                                SEXP r_environment,
+                                                SEXP r_value);
 SEXP r_pattern_create_logical_literal_pattern(SEXP r_expression,
                                               SEXP r_environment,
                                               SEXP r_value);
@@ -48,9 +48,9 @@ SEXP r_pattern_create_or_binary_pattern(SEXP r_expression,
                                         SEXP r_environment,
                                         SEXP r_first_pattern,
                                         SEXP r_second_pattern);
-SEXP r_pattern_create_vector_variadic_pattern(SEXP r_expression,
-                                              SEXP r_environment,
-                                              SEXP r_sub_patterns);
+//SEXP r_pattern_create_vector_variadic_pattern(SEXP r_expression,
+//                                              SEXP r_environment,
+//                                              SEXP r_sub_patterns);
 SEXP r_pattern_get_expression(SEXP r_pattern);
 SEXP r_pattern_get_environment(SEXP r_pattern);
 SEXP r_pattern_get_identifier_names(SEXP r_pattern);

@@ -13,13 +13,13 @@ class NotUnaryPattern: public UnaryPattern {
         : UnaryPattern(r_expression, r_environment, sub_pattern) {
     }
 
-    Context match_value(SEXP r_value,
+    Context match_value(RValue value,
                         const Context& context) const override final {
         Context clone(context);
 
         clone.set_success();
 
-        clone = get_sub_pattern()->match_value(r_value, clone);
+        clone = get_sub_pattern()->match_value(value, clone);
 
         clone.toggle_status();
 

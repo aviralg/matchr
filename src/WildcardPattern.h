@@ -12,7 +12,7 @@ class WildcardPattern: public Pattern {
         : Pattern(r_expression, r_environment) {
     }
 
-    Context match_value(SEXP r_value,
+    Context match_value(RValue value,
                         const Context& context) const override final {
         Context clone(context);
 

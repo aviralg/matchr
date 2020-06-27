@@ -12,11 +12,12 @@
 #include "RangeUnaryPattern.h"
 #include "RawLiteralPattern.h"
 #include "RealLiteralPattern.h"
-#include "StringLiteralPattern.h"
-#include "VectorVariadicPattern.h"
+#include "CharacterLiteralPattern.h"
+//#include "VectorVariadicPattern.h"
 #include "WildcardPattern.h"
 
 using matchr::AndBinaryPattern;
+using matchr::CharacterLiteralPattern;
 using matchr::ComplexLiteralPattern;
 using matchr::GroupUnaryPattern;
 using matchr::IdentifierNames;
@@ -31,8 +32,7 @@ using matchr::PredicatePattern;
 using matchr::RangeUnaryPattern;
 using matchr::RawLiteralPattern;
 using matchr::RealLiteralPattern;
-using matchr::StringLiteralPattern;
-using matchr::VectorVariadicPattern;
+//using matchr::VectorVariadicPattern;
 using matchr::WildcardPattern;
 
 SEXP r_pattern_create_wildcard_pattern(SEXP r_expression, SEXP r_environment) {
@@ -77,11 +77,11 @@ SEXP r_pattern_create_raw_literal_pattern(SEXP r_expression,
     return Pattern::to_sexp(pattern);
 }
 
-SEXP r_pattern_create_string_literal_pattern(SEXP r_expression,
-                                             SEXP r_environment,
-                                             SEXP r_value) {
+SEXP r_pattern_create_character_literal_pattern(SEXP r_expression,
+                                                SEXP r_environment,
+                                                SEXP r_value) {
     std::string value(CHAR(asChar(r_value)));
-    PatternSPtr pattern = std::make_shared<StringLiteralPattern>(
+    PatternSPtr pattern = std::make_shared<CharacterLiteralPattern>(
         r_expression, r_environment, value);
     return Pattern::to_sexp(pattern);
 }
@@ -165,22 +165,22 @@ SEXP r_pattern_create_or_binary_pattern(SEXP r_expression,
     return Pattern::to_sexp(pattern);
 }
 
-SEXP r_pattern_create_vector_variadic_pattern(SEXP r_expression,
-                                              SEXP r_environment,
-                                              SEXP r_sub_patterns) {
-    VectorVariadicPattern* pattern =
-        new VectorVariadicPattern(r_expression, r_environment);
-
-    int pattern_count = LENGTH(r_sub_patterns);
-
-    for (int index = 0; index < pattern_count; ++index) {
-        SEXP r_sub_pattern = VECTOR_ELT(r_sub_patterns, index);
-        PatternSPtr sub_pattern = Pattern::from_sexp(r_sub_pattern);
-        pattern->add_sub_pattern(sub_pattern);
-    }
-
-    return Pattern::to_sexp(std::shared_ptr<Pattern>(pattern));
-}
+//SEXP r_pattern_create_vector_variadic_pattern(SEXP r_expression,
+//                                              SEXP r_environment,
+//                                              SEXP r_sub_patterns) {
+//    VectorVariadicPattern* pattern =
+//        new VectorVariadicPattern(r_expression, r_environment);
+//
+//    int pattern_count = LENGTH(r_sub_patterns);
+//
+//    for (int index = 0; index < pattern_count; ++index) {
+//        SEXP r_sub_pattern = VECTOR_ELT(r_sub_patterns, index);
+//        PatternSPtr sub_pattern = Pattern::from_sexp(r_sub_pattern);
+//        pattern->add_sub_pattern(sub_pattern);
+//    }
+//
+//    return Pattern::to_sexp(std::shared_ptr<Pattern>(pattern));
+//}
 
 SEXP r_pattern_get_expression(SEXP r_pattern) {
     PatternSPtr pattern = Pattern::from_sexp(r_pattern);

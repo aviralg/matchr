@@ -28,7 +28,7 @@ class Evaluand: public Object {
     }
 
     SEXP evaluate(Context context) {
-        SEXP environment = context.as_environment(get_environment());
+        SEXP environment = context.get_bindings().as_environment(get_environment());
         return Rf_eval(get_expression(), environment);
     }
 

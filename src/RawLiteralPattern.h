@@ -15,13 +15,11 @@ class RawLiteralPattern: public LiteralPattern {
         return value_;
     }
 
-    Context match_value(SEXP r_value,
+    Context match_value(RValue value,
                         const Context& context) const override final {
         Context clone(context);
 
-        bool status =
-            TYPEOF(r_value) == RAWSXP &&
-            RAW_ELT(r_value, clone.get_range().get_minimum()) == get_value();
+        bool status = value.is_raw_vector() && value.has_raw_value(get_value());
 
         clone.set_status(status);
 

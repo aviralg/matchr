@@ -1,16 +1,22 @@
-#ifndef MATCHR_RANGE_H
-#define MATCHR_RANGE_H
+#ifndef MATCHR_INTERVAL_H
+#define MATCHR_INTERVAL_H
 
 #include <algorithm>
 
 namespace matchr {
 
-class Range {
+class Interval {
   public:
-    Range(): Range(Range::MINIMUM, Range::MAXIMUM) {
+    Interval(bool open = false)
+        : Interval(open, Interval::MINIMUM, Interval::MAXIMUM) {
     }
 
-    Range(int minimum, int maximum): minimum_(minimum), maximum_(maximum) {
+    Interval(bool open, int minimum, int maximum)
+        : open_(open), minimum_(minimum), maximum_(maximum) {
+    }
+
+    bool is_open() const {
+        return open_;
     }
 
     int get_minimum() const {
@@ -38,20 +44,20 @@ class Range {
         set(value, value);
     }
 
-    void add(const Range& range) {
-        minimum_ = std::min(minimum_, range.get_minimum());
-        maximum_ = std::min(maximum_, range.get_maximum());
+    void add(const Interval& interval) {
+        minimum_ = std::min(minimum_, interval.get_minimum());
+        maximum_ = std::min(maximum_, interval.get_maximum());
     }
 
     static const int MINIMUM;
-
     static const int MAXIMUM;
 
   private:
+    bool open_;
     int minimum_;
     int maximum_;
 };
 
 } // namespace matchr
 
-#endif /* MATCHR_RANGE_H */
+#endif /* MATCHR_INTERVAL_H */

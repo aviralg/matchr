@@ -4,7 +4,8 @@
 #include "Object.h"
 #include "Context.h"
 #include "IdentifierNames.h"
-#include "Range.h"
+#include "Interval.h"
+#include "RValue.h"
 
 namespace matchr {
 
@@ -14,7 +15,7 @@ class Pattern: public Object {
         : Object()
         , r_expression_(r_expression)
         , r_environment_(r_environment)
-        , range_(1, 1) {
+        , match_interval_(false, 1, 1) {
         R_PreserveObject(r_expression_);
         R_PreserveObject(r_environment_);
     }
@@ -32,21 +33,21 @@ class Pattern: public Object {
         return r_environment_;
     }
 
-    virtual Context match_value(SEXP r_value) const {
+    virtual Context match_value(RValue value) const {
         Context context(true);
-        return match_value(r_value, context);
+        return match_value(value, context);
     }
 
-    virtual Context match_value(SEXP r_value, const Context& context) const = 0;
+    virtual Context match_value(RValue value, const Context& context) const = 0;
 
     virtual IdentifierNames get_identifier_names() const = 0;
 
-    const Range& get_range() const {
-        return range_;
+    const Interval& get_match_interval() const {
+        return match_interval_;
     }
 
-    Range& get_range() {
-        return range_;
+    Interval& get_match_interval() {
+        return match_interval_;
     }
 
     static void initialize();
@@ -64,7 +65,7 @@ class Pattern: public Object {
   private:
     SEXP r_expression_;
     SEXP r_environment_;
-    Range range_;
+    Interval match_interval_;
 
     static SEXP class_;
 };

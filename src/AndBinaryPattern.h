@@ -17,16 +17,16 @@ class AndBinaryPattern: public BinaryPattern {
                         second_sub_pattern) {
     }
 
-    Context match_value(SEXP r_value,
+    Context match_value(RValue value,
                         const Context& context) const override final {
         Context clone(context);
 
         clone.set_success();
 
-        clone = get_first_sub_pattern()->match_value(r_value, clone);
+        clone = get_first_sub_pattern()->match_value(value, clone);
 
         if (clone) {
-            clone = get_second_sub_pattern()->match_value(r_value, clone);
+            clone = get_second_sub_pattern()->match_value(value, clone);
         }
 
         return clone;
