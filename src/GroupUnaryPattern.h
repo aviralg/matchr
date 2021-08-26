@@ -4,26 +4,21 @@
 #include "UnaryPattern.h"
 #include "Context.h"
 
-namespace matchr {
-
 class GroupUnaryPattern: public UnaryPattern {
   public:
-    explicit GroupUnaryPattern(SEXP r_expression,
-                               SEXP r_environment,
-                               PatternSPtr sub_pattern)
-        : UnaryPattern(r_expression, r_environment, sub_pattern) {
+    explicit GroupUnaryPattern(SEXP r_expression, Pattern* sub_pattern)
+        : UnaryPattern(r_expression, sub_pattern) {
     }
 
-    Context match_value(RValue value,
-                        const Context& context) const override final {
-        return get_sub_pattern()->match_value(value, context);
+    Context match(RValue value,
+                  SEXP r_pat_env,
+                  const Context& context) const override final {
+        return get_sub_pattern()->match(value, r_pat_env, context);
     }
 
     IdentifierNames get_identifier_names() const override final {
         return get_sub_pattern()->get_identifier_names();
     }
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_GROUP_UNARY_PATTERN_H */

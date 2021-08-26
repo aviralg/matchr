@@ -1,14 +1,4 @@
 
-#' @export
-pattern <- function(expression, environment = parent.frame(), quote = TRUE) {
-
-    if (quote) expression <- substitute(expression)
-
-    stopifnot(is_environment(environment))
-
-    create_pattern(expression, environment, character(0))
-}
-
 range <- function(expression, minimum = 0L, maximum = 2147483647L) {
     expression <- substitute(expression)
 

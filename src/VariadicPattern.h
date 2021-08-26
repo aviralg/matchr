@@ -4,37 +4,37 @@
 #include "Pattern.h"
 #include <vector>
 
-namespace matchr {
-
 class VariadicPattern: public Pattern {
   public:
-    explicit VariadicPattern(SEXP r_expression, SEXP r_environment)
-        : Pattern(r_expression, r_environment) {
+    explicit VariadicPattern(SEXP r_expression,
+                             const std::vector<Pattern*>& patterns)
+        : Pattern(r_expression), patterns_(patterns) {
     }
 
     virtual ~VariadicPattern() {
+        for (int i = 0; i < get_size(); ++i) {
+            delete at(i);
+        }
     }
 
-    void add_sub_pattern(PatternSPtr pattern) {
-        sub_patterns_.push_back(pattern);
+    int get_size() const {
+        return patterns_.size();
     }
 
-    int get_sub_pattern_count() const {
-        return sub_patterns_.size();
+    Pattern* at(int index) const {
+        return patterns_.at(index);
     }
 
-    PatternSPtr get_sub_pattern(int index) {
-        return sub_patterns_[index];
-    }
-
-    const PatternSPtr get_sub_pattern(int index) const {
-        return sub_patterns_.at(index);
+    IdentifierNames get_identifier_names() const override final {
+        IdentifierNames names;
+        for (int i = 0; i < get_size(); ++i) {
+            names.merge(at(i)->get_identifier_names());
+        }
+        return names;
     }
 
   private:
-    std::vector<PatternSPtr> sub_patterns_;
+    std::vector<Pattern*> patterns_;
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_VARIADIC_PATTERN_H */

@@ -1,58 +1,31 @@
 #ifndef MATCHR_EVALUAND_H
 #define MATCHR_EVALUAND_H
 
-#include "Object.h"
 #include "Context.h"
 
-namespace matchr {
-
-class Evaluand: public Object {
+class Evaluand {
   public:
-    Evaluand(SEXP r_expression, SEXP r_environment)
-        : Object(), r_expression_(r_expression), r_environment_(r_environment) {
-        R_PreserveObject(r_expression_);
-        R_PreserveObject(r_environment_);
-    }
-
     ~Evaluand() {
-        R_ReleaseObject(r_expression_);
-        R_ReleaseObject(r_environment_);
     }
 
     SEXP get_expression() {
         return r_expression_;
     }
 
-    SEXP get_environment() {
-        return r_environment_;
+    SEXP evaluate(Context context, SEXP r_eval_env) {
+        SEXP r_env = context.get_bindings().as_environment(r_eval_env);
+        return Rf_eval(get_expression(), r_env);
     }
 
-    SEXP evaluate(Context context) {
-        SEXP environment = context.get_bindings().as_environment(get_environment());
-        return Rf_eval(get_expression(), environment);
-    }
-
-    static void initialize();
-
-    static void finalize();
-
-    static SEXP get_class();
-
-    static std::shared_ptr<Evaluand> from_sexp(SEXP r_evaluand);
-
-    static SEXP to_sexp(std::shared_ptr<Evaluand> evaluand);
-
-    static void destroy_sexp(SEXP r_evaluand);
+    static Evaluand* create(SEXP r_expression);
 
   private:
     SEXP r_expression_;
-    SEXP r_environment_;
 
-    static SEXP class_;
+    Evaluand(SEXP r_expression): r_expression_(r_expression) {
+        // We don't need to preserve r_expression because the outermost match
+        // expression is preserved already by matcher.
+    }
 };
-
-using EvaluandSPtr = std::shared_ptr<Evaluand>;
-
-} // namespace matchr
 
 #endif /* MATCHR_EVALUAND_H */

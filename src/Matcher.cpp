@@ -1,48 +1,45 @@
 #include "Matcher.h"
 
-namespace matchr {
-
-SEXP Matcher::class_ = NULL;
-
-void Matcher::initialize() {
-    class_ = Object::create_class("matchr_matcher");
-    R_PreserveObject(class_);
+Matcher* Matcher::create(SEXP r_clauses, SEXP r_pat_env, SEXP r_eval_env) {
+    Matcher* matcher = new Matcher(r_pat_env, r_eval_env);
+    int count = LENGTH(r_clauses);
+    for (int index = 0; index < count; ++index) {
+        Clause* clause = Clause::create(VECTOR_ELT(r_clauses, index));
+        matcher->add_clause_(clause);
+    }
+    return matcher;
 }
 
-void Matcher::finalize() {
-    R_ReleaseObject(class_);
-    class_ = NULL;
-}
-
-SEXP Matcher::get_class() {
-    return class_;
-}
-
-MatcherSPtr Matcher::from_sexp(SEXP r_matcher) {
+Matcher* Matcher::from_sexp(SEXP r_matcher) {
     void* matcher = R_ExternalPtrAddr(r_matcher);
     if (matcher == NULL) {
-        Rf_errorcall(R_NilValue, "Matcher::from_sexp: object is null");
+        Rf_errorcall(R_NilValue, "null matcher object encountered");
     } else {
-        return *static_cast<MatcherSPtr*>(matcher);
+        return static_cast<Matcher*>(matcher);
     }
 }
 
-SEXP Matcher::to_sexp(MatcherSPtr matcher) {
-    SEXP r_matcher = PROTECT(
-        R_MakeExternalPtr(new MatcherSPtr(matcher), R_NilValue, R_NilValue));
+SEXP get_class() {
+    SEXP classnames = PROTECT(allocVector(STRSXP, 1));
+    SET_STRING_ELT(classnames, 0, mkChar("matchr_matcher"));
+    UNPROTECT(1);
+    return classnames;
+}
 
-    R_RegisterCFinalizerEx(r_matcher, Matcher::destroy_sexp, TRUE);
+void destroy_sexp(SEXP r_matcher) {
+    delete static_cast<Matcher*>(R_ExternalPtrAddr(r_matcher));
+    R_SetExternalPtrAddr(r_matcher, NULL);
+}
 
-    setAttrib(r_matcher, R_ClassSymbol, Matcher::get_class());
+SEXP Matcher::to_sexp(Matcher* matcher) {
+    SEXP r_matcher =
+        PROTECT(R_MakeExternalPtr(matcher, R_NilValue, R_NilValue));
+
+    R_RegisterCFinalizerEx(r_matcher, destroy_sexp, TRUE);
+
+    setAttrib(r_matcher, R_ClassSymbol, get_class());
 
     UNPROTECT(1);
 
     return r_matcher;
 }
-
-void Matcher::destroy_sexp(SEXP r_matcher) {
-    delete static_cast<MatcherSPtr*>(R_ExternalPtrAddr(r_matcher));
-    R_SetExternalPtrAddr(r_matcher, NULL);
-}
-
-} // namespace matchr

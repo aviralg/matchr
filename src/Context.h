@@ -5,8 +5,6 @@
 #include "Interval.h"
 #include "utilities.h"
 
-namespace matchr {
-
 class Context {
   public:
     explicit Context(bool success)
@@ -104,7 +102,5 @@ class Context {
     Bindings bindings_;
     int match_count_;
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_CONTEXT_H */

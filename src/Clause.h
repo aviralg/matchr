@@ -1,58 +1,47 @@
 #ifndef MATCHR_CLAUSE_H
 #define MATCHR_CLAUSE_H
 
-#include "Object.h"
 #include "Pattern.h"
 #include "Evaluand.h"
 
-namespace matchr {
-
-class Clause: public Object {
+class Clause {
   public:
-    explicit Clause(PatternSPtr pattern, EvaluandSPtr evaluand)
-        : Object(), pattern_(pattern), evaluand_(evaluand) {
-    }
-
     ~Clause() {
+        delete pattern_;
+        delete evaluand_;
     }
 
-    PatternSPtr get_pattern() {
+    Pattern* get_pattern() {
         return pattern_;
     }
 
-    EvaluandSPtr get_evaluand() {
+    Evaluand* get_evaluand() {
         return evaluand_;
     }
 
-    Context match_value(RValue value) {
-        return get_pattern()->match_value(value);
+    SEXP match(SEXP r_value, SEXP r_pat_env, SEXP r_eval_env) {
+        SEXP r_result = NULL;
+
+        Pattern* pattern = get_pattern();
+        Context context = pattern->match(RValue(r_value), r_pat_env);
+
+        if (context) {
+            Evaluand* evaluand = get_evaluand();
+            r_result = evaluand->evaluate(context, r_eval_env);
+        }
+
+        return r_result;
     }
 
-    SEXP evaluate_expression(Context context) {
-        return get_evaluand()->evaluate(context);
-    }
-
-    static void initialize();
-
-    static void finalize();
-
-    static SEXP get_class();
-
-    static std::shared_ptr<Clause> from_sexp(SEXP r_clause);
-
-    static SEXP to_sexp(std::shared_ptr<Clause> clause);
-
-    static void destroy_sexp(SEXP r_clause);
+    static Clause* create(SEXP r_expression);
 
   private:
-    PatternSPtr pattern_;
-    EvaluandSPtr evaluand_;
+    Pattern* pattern_;
+    Evaluand* evaluand_;
 
-    static SEXP class_;
+    Clause(Pattern* pattern, Evaluand* evaluand)
+        : pattern_(pattern), evaluand_(evaluand) {
+    }
 };
-
-using ClauseSPtr = std::shared_ptr<Clause>;
-
-} // namespace matchr
 
 #endif /* MATCHR_CLAUSE_H */

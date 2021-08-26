@@ -4,22 +4,19 @@
 #include "Pattern.h"
 #include "Context.h"
 
-namespace matchr {
-
 class IdentifierPattern: public Pattern {
   public:
-    explicit IdentifierPattern(SEXP r_expression,
-                               SEXP r_environment,
-                               const std::string name)
-        : Pattern(r_expression, r_environment), name_(name) {
+    explicit IdentifierPattern(SEXP r_expression, const std::string name)
+        : Pattern(r_expression), name_(name) {
     }
 
     const std::string& get_name() const {
         return name_;
     }
 
-    Context match_value(RValue value,
-                        const Context& context) const override final {
+    Context match(RValue value,
+                  SEXP r_pat_env,
+                  const Context& context) const override final {
         Context clone(context);
 
         clone.get_bindings().bind(get_name(), value.get_value());
@@ -36,7 +33,5 @@ class IdentifierPattern: public Pattern {
   private:
     std::string name_;
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_IDENTIFIER_PATTERN_H */

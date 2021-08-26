@@ -3,20 +3,19 @@
 
 #include "LiteralPattern.h"
 
-namespace matchr {
-
 class RealLiteralPattern: public LiteralPattern {
   public:
-    RealLiteralPattern(SEXP r_expression, SEXP r_environment, double value)
-        : LiteralPattern(r_expression, r_environment), value_(value) {
+    RealLiteralPattern(SEXP r_expression, double value)
+        : LiteralPattern(r_expression), value_(value) {
     }
 
     double get_value() const {
         return value_;
     }
 
-    Context match_value(RValue value,
-                        const Context& context) const override final {
+    Context match(RValue value,
+                  SEXP r_pat_env,
+                  const Context& context) const override final {
         Context clone(context);
 
         bool status =
@@ -30,7 +29,5 @@ class RealLiteralPattern: public LiteralPattern {
   private:
     const double value_;
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_REAL_LITERAL_PATTERN_H */

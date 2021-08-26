@@ -3,8 +3,6 @@
 
 #include <algorithm>
 
-namespace matchr {
-
 class Interval {
   public:
     Interval(bool open = false)
@@ -57,7 +55,5 @@ class Interval {
     int minimum_;
     int maximum_;
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_INTERVAL_H */

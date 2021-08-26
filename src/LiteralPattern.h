@@ -3,19 +3,14 @@
 
 #include "Pattern.h"
 
-namespace matchr {
-
 class LiteralPattern: public Pattern {
   public:
-    LiteralPattern(SEXP r_expression, SEXP r_environment)
-        : Pattern(r_expression, r_environment) {
+    LiteralPattern(SEXP r_expression): Pattern(r_expression) {
     }
 
     IdentifierNames get_identifier_names() const override final {
         return IdentifierNames();
     }
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_LITERAL_PATTERN_H */

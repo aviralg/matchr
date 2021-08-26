@@ -5,22 +5,20 @@
 #include "Context.h"
 #include <unordered_map>
 
-namespace matchr {
-
 class RangeUnaryPattern: public UnaryPattern {
   public:
     explicit RangeUnaryPattern(SEXP r_expression,
-                               SEXP r_environment,
-                               PatternSPtr sub_pattern,
+                               Pattern* sub_pattern,
                                int minimum,
                                int maximum)
-        : UnaryPattern(r_expression, r_environment, sub_pattern) {
+        : UnaryPattern(r_expression, sub_pattern) {
         get_match_interval().set_minimum(minimum);
         get_match_interval().set_maximum(maximum);
     }
 
-    Context match_value(RValue value,
-                        const Context& context) const override final {
+    Context match(RValue value,
+                  SEXP r_pat_env,
+                  const Context& context) const override final {
         Context clone(context);
 
         Interval index_interval(value.get_index_interval());
@@ -45,7 +43,7 @@ class RangeUnaryPattern: public UnaryPattern {
              ++match_index) {
             value.get_index_interval().set(match_index);
             Context clone_required =
-                get_sub_pattern()->match_value(value, clone);
+                get_sub_pattern()->match(value, r_pat_env, clone);
             /* if matching fails, return */
             if (!clone_required) {
                 clone_required.set_match_count(match_count);
@@ -67,7 +65,7 @@ class RangeUnaryPattern: public UnaryPattern {
              ++match_index) {
             value.get_index_interval().set(match_index);
             Context clone_required =
-                get_sub_pattern()->match_value(value, clone);
+                get_sub_pattern()->match(value, r_pat_env, clone);
             /* if matching fails, return */
             if (!clone_required) {
                 break;
@@ -103,7 +101,5 @@ class RangeUnaryPattern: public UnaryPattern {
         return get_sub_pattern()->get_identifier_names();
     }
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_RANGE_UNARY_PATTERN_H */

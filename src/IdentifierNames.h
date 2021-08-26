@@ -4,8 +4,6 @@
 #include <vector>
 #include <string>
 
-namespace matchr {
-
 class IdentifierNames {
   public:
     IdentifierNames() {
@@ -82,7 +80,5 @@ class IdentifierNames {
   private:
     std::vector<std::string> names_;
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_IDENTIFIER_NAMES_H */

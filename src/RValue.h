@@ -5,8 +5,6 @@
 #include "Interval.h"
 #include "r.h"
 
-namespace matchr {
-
 class RValue {
   public:
     RValue(SEXP r_value, Interval index_interval)
@@ -255,7 +253,5 @@ class RValue {
     SEXP r_value_;
     Interval index_interval_;
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_R_VALUE_H */

@@ -1,11 +1,12 @@
-#ifndef MATCHR_PREDICATE_PATTERN_H
-#define MATCHR_PREDICATE_PATTERN_H
+#ifndef MATCHR_SATISFIES_PATTERN_H
+#define MATCHR_SATISFIES_PATTERN_H
 
 #include "Pattern.h"
+#include "Context.h"
 
-class PredicatePattern: public Pattern {
+class SatisfiesPattern: public Pattern {
   public:
-    PredicatePattern(SEXP r_expression, SEXP r_predicate)
+    explicit SatisfiesPattern(SEXP r_expression, SEXP r_predicate)
         : Pattern(r_expression), r_predicate_(r_predicate) {
     }
 
@@ -20,8 +21,8 @@ class PredicatePattern: public Pattern {
 
         SEXP r_predicate = get_predicate();
 
-        RValue result =
-            Rf_eval(Rf_lang2(r_predicate, value.get_value()), r_pat_env);
+        /* TODO: add env with .*/
+        RValue result = Rf_eval(r_predicate, r_pat_env);
 
         bool status =
             result.is_logical_literal() && result.get_logical_element(0);
@@ -39,4 +40,4 @@ class PredicatePattern: public Pattern {
     SEXP r_predicate_;
 };
 
-#endif /* MATCHR_PREDICATE_PATTERN_H */
+#endif /* MATCHR_SATISFIES_PATTERN_H */

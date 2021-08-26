@@ -1,48 +1,36 @@
 #include "Clause.h"
+#include "Pattern.h"
+#include "Evaluand.h"
 
-namespace matchr {
-
-SEXP Clause::class_ = NULL;
-
-void Clause::initialize() {
-    class_ = Object::create_class("matchr_clause");
-    R_PreserveObject(class_);
-}
-
-void Clause::finalize() {
-    R_ReleaseObject(class_);
-    class_ = NULL;
-}
-
-SEXP Clause::get_class() {
-    return class_;
-}
-
-ClauseSPtr Clause::from_sexp(SEXP r_clause) {
-    void* clause = R_ExternalPtrAddr(r_clause);
-    if (clause == NULL) {
-        Rf_errorcall(R_NilValue, "Clause::from_sexp: object is null");
-    } else {
-        return *static_cast<ClauseSPtr*>(clause);
+Clause* Clause::create(SEXP r_expression) {
+    if (TYPEOF(r_expression) != LANGSXP) {
+        /* TODO: improve error message: convert r_expression to string */
+        Rf_error("expected clause expression of the form '<pattern> ~ "
+                 "<expression>', got: ");
     }
+
+    if (Rf_length(r_expression) != 3) {
+        /* TODO: improve error message: convert r_expression to string */
+        Rf_error("expected clause expression of the form '<pattern> ~ "
+                 "<expression>', got: ");
+    }
+
+    SEXP r_head = CAR(r_expression);
+
+    if (TYPEOF(r_head) != SYMSXP) {
+        /* TODO: improve error message: convert r_expression to string */
+        Rf_error("expected clause expression of the form '<pattern> ~ "
+                 "<expression>', got: ");
+    }
+
+    std::string head = CHAR(PRINTNAME(r_head));
+
+    if (head != "~") {
+        /* TODO: improve error message: convert r_expression to string */
+        Rf_error("expected clause expression of the form '<pattern> ~ "
+                 "<expression>', got: ");
+    }
+
+    return new Clause(Pattern::create(CADR(r_expression)),
+                      Evaluand::create(CADDR(r_expression)));
 }
-
-SEXP Clause::to_sexp(ClauseSPtr clause) {
-    SEXP r_clause = PROTECT(
-        R_MakeExternalPtr(new ClauseSPtr(clause), R_NilValue, R_NilValue));
-
-    R_RegisterCFinalizerEx(r_clause, Clause::destroy_sexp, TRUE);
-
-    setAttrib(r_clause, R_ClassSymbol, Clause::get_class());
-
-    UNPROTECT(1);
-
-    return r_clause;
-}
-
-void Clause::destroy_sexp(SEXP r_clause) {
-    delete static_cast<ClauseSPtr*>(R_ExternalPtrAddr(r_clause));
-    R_SetExternalPtrAddr(r_clause, NULL);
-}
-
-} // namespace matchr

@@ -4,16 +4,14 @@
 #include "Pattern.h"
 #include "Context.h"
 
-namespace matchr {
-
 class WildcardPattern: public Pattern {
   public:
-    explicit WildcardPattern(SEXP r_expression, SEXP r_environment)
-        : Pattern(r_expression, r_environment) {
+    explicit WildcardPattern(SEXP r_expression): Pattern(r_expression) {
     }
 
-    Context match_value(RValue value,
-                        const Context& context) const override final {
+    Context match(RValue value,
+                  SEXP r_pat_env,
+                  const Context& context) const override final {
         Context clone(context);
 
         clone.set_success();
@@ -25,7 +23,5 @@ class WildcardPattern: public Pattern {
         return IdentifierNames();
     }
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_WILDCARD_PATTERN_H */

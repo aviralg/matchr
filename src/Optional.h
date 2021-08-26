@@ -1,8 +1,6 @@
 #ifndef MATCHR_OPTIONAL_H
 #define MATCHR_OPTIONAL_H
 
-namespace matchr {
-
 template <typename T>
 class Optional {
   public:
@@ -28,7 +26,5 @@ class Optional {
     bool status_;
     T value_;
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_OPTIONAL_H */

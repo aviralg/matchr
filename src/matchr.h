@@ -3,12 +3,12 @@
 
 #include "r.h"
 
-namespace matchr {
+SEXP matchr_initialize(SEXP r_package_environment);
 
-void initialize_matchr(SEXP r_package_environment);
+SEXP matchr_finalize();
 
-void finalize_matchr();
+SEXP matchr_create(SEXP r_clauses, SEXP r_pat_env, SEXP r_eval_env);
 
-}; // namespace matchr
+SEXP matchr_match(SEXP r_matcher, SEXP r_value);
 
 #endif /* MATCHR_MATCHR_H */

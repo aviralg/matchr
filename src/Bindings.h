@@ -8,8 +8,6 @@
 #include "Optional.h"
 #include "utilities.h"
 
-namespace matchr {
-
 class Bindings {
   public:
     explicit Bindings() {
@@ -101,7 +99,5 @@ class Bindings {
     std::vector<std::string> identifiers_;
     std::vector<SEXP> r_values_;
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_BINDINGS_H */

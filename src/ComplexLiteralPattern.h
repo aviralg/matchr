@@ -4,14 +4,10 @@
 #include "LiteralPattern.h"
 #include "r.h"
 
-namespace matchr {
-
 class ComplexLiteralPattern: public LiteralPattern {
   public:
-    ComplexLiteralPattern(SEXP r_expression,
-                          SEXP r_environment,
-                          const Rcomplex& value)
-        : LiteralPattern(r_expression, r_environment), value_(value) {
+    ComplexLiteralPattern(SEXP r_expression, const Rcomplex& value)
+        : LiteralPattern(r_expression), value_(value) {
     }
 
     const Rcomplex& get_value() const {
@@ -23,8 +19,9 @@ class ComplexLiteralPattern: public LiteralPattern {
         return lhs.r == rhs.r && lhs.i == rhs.i;
     }
 
-    Context match_value(RValue value,
-                        const Context& context) const override final {
+    Context match(RValue value,
+                  SEXP r_pat_env,
+                  const Context& context) const override final {
         Context clone(context);
 
         bool status =
@@ -38,7 +35,5 @@ class ComplexLiteralPattern: public LiteralPattern {
   private:
     const Rcomplex value_;
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_COMPLEX_LITERAL_PATTERN_H */

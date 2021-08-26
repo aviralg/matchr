@@ -3,16 +3,14 @@
 
 #include "VariadicPattern.h"
 
-namespace matchr {
-
 class VectorVariadicPattern: public VariadicPattern {
   public:
-    VectorVariadicPattern(SEXP r_expression, SEXP r_environment)
-        : VariadicPattern(r_expression, r_environment) {
+    VectorVariadicPattern(SEXP r_expression): VariadicPattern(r_expression) {
     }
 
-    Context match_value(RValue value,
-                        const Context& context) const override final {
+    Context match(RValue value,
+                  SEXP r_pat_env,
+                  const Context& context) const override final {
         Context clone(context);
 
         if (!value.is_vector()) {
@@ -30,9 +28,9 @@ class VectorVariadicPattern: public VariadicPattern {
         clone.set_success();
 
         for (int index = 0; index < length && clone; ++index) {
-            const PatternSPtr pattern = get_sub_pattern(index);
+            const Pattern* pattern = get_sub_pattern(index);
             SEXP r_element = PROTECT(get_element_(r_value, index));
-            clone = pattern->match_value(r_element, clone);
+            clone = pattern->match(r_element, clone);
             UNPROTECT(1);
         }
 
@@ -42,7 +40,7 @@ class VectorVariadicPattern: public VariadicPattern {
     IdentifierNames get_identifier_names() const override final {
         IdentifierNames identifier_names;
         for (int index = 0; index < get_sub_pattern_count(); ++index) {
-            const PatternSPtr pattern = get_sub_pattern(index);
+            const Pattern* pattern = get_sub_pattern(index);
             identifier_names.merge(pattern->get_identifier_names());
         }
         return identifier_names;
@@ -71,7 +69,5 @@ class VectorVariadicPattern: public VariadicPattern {
         return R_NilValue;
     }
 };
-
-} // namespace matchr
 
 #endif /* MATCHR_VECTOR_VARIADIC_PATTERN_H */
