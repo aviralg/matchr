@@ -62,7 +62,8 @@ class RValue {
     }
 
     std::string get_character_element(int index) {
-        return CHAR(STRING_ELT(get_value(), index));
+        int new_index = transform_index_(index);
+        return CHAR(STRING_ELT(get_value(), new_index));
     }
 
     /***************************************************************************
@@ -78,7 +79,8 @@ class RValue {
     }
 
     int get_logical_element(int index) {
-        return LOGICAL(get_value())[index];
+        int new_index = transform_index_(index);
+        return LOGICAL(get_value())[new_index];
     }
 
     /***************************************************************************
@@ -94,7 +96,8 @@ class RValue {
     }
 
     double get_real_element(int index) {
-        return REAL(get_value())[index];
+        int new_index = transform_index_(index);
+        return REAL(get_value())[new_index];
     }
 
     /***************************************************************************
@@ -110,7 +113,8 @@ class RValue {
     }
 
     int get_integer_element(int index) {
-        return INTEGER(get_value())[index];
+        int new_index = transform_index_(index);
+        return INTEGER(get_value())[new_index];
     }
 
     /***************************************************************************
@@ -126,7 +130,8 @@ class RValue {
     }
 
     const Rcomplex& get_complex_element(int index) {
-        return COMPLEX(get_value())[index];
+        int new_index = transform_index_(index);
+        return COMPLEX(get_value())[new_index];
     }
 
     /***************************************************************************
@@ -142,7 +147,8 @@ class RValue {
     }
 
     Rbyte get_raw_element(int index) {
-        return RAW_ELT(get_value(), index);
+        int new_index = transform_index_(index);
+        return RAW_ELT(get_value(), new_index);
     }
 
     /***************************************************************************
