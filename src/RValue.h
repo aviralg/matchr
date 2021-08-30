@@ -2,28 +2,21 @@
 #define MATCHR_R_VALUE_H
 
 #include <string>
-#include "Interval.h"
 #include "r.h"
 
 class RValue {
   public:
-    RValue(SEXP r_value, Interval index_interval)
-        : r_value_(r_value), index_interval_(index_interval) {
+    /* TODO: check if all R values have length or not */
+    RValue(SEXP r_value)
+        : r_value_(r_value), begin_(0), end_(Rf_length(r_value)) {
     }
 
-    RValue(SEXP r_value): RValue(r_value, Interval(true, -1, -1)) {
+    RValue(SEXP r_value, int begin, int end)
+        : r_value_(r_value), begin_(begin), end_(end) {
     }
 
     SEXP get_value() const {
         return r_value_;
-    }
-
-    const Interval& get_index_interval() const {
-        return index_interval_;
-    }
-
-    Interval& get_index_interval() {
-        return index_interval_;
     }
 
     SEXPTYPE get_type() const {
@@ -35,7 +28,7 @@ class RValue {
     }
 
     int get_length() const {
-        return Rf_length(get_value());
+        return end_ - begin_;
     }
 
     bool has_length(int size) const {
@@ -52,7 +45,7 @@ class RValue {
                type == INTSXP || type == CPLXSXP || type == RAWSXP;
     }
 
-    bool is_literal() const {
+    bool is_scalar() const {
         return is_vector() && has_length(1);
     }
 
@@ -64,17 +57,12 @@ class RValue {
         return has_type(STRSXP);
     }
 
-    bool is_character_literal() {
+    bool is_character_scalar() {
         return is_character_vector() && get_length() == 1;
     }
 
     std::string get_character_element(int index) {
         return CHAR(STRING_ELT(get_value(), index));
-    }
-
-    bool has_character_value(const std::string& value) {
-        return value ==
-               get_character_element(get_index_interval().get_minimum());
     }
 
     /***************************************************************************
@@ -85,16 +73,12 @@ class RValue {
         return has_type(LGLSXP);
     }
 
-    bool is_logical_literal() {
+    bool is_logical_scalar() {
         return is_logical_vector() && get_length() == 1;
     }
 
-    bool get_logical_element(int index) {
+    int get_logical_element(int index) {
         return LOGICAL(get_value())[index];
-    }
-
-    bool has_logical_value(bool value) {
-        return value == get_logical_element(get_index_interval().get_minimum());
     }
 
     /***************************************************************************
@@ -105,16 +89,12 @@ class RValue {
         return has_type(REALSXP);
     }
 
-    bool is_real_literal() {
+    bool is_real_scalar() {
         return is_real_vector() && get_length() == 1;
     }
 
     double get_real_element(int index) {
         return REAL(get_value())[index];
-    }
-
-    bool has_real_value(double value) {
-        return value == get_real_element(get_index_interval().get_minimum());
     }
 
     /***************************************************************************
@@ -125,16 +105,12 @@ class RValue {
         return has_type(INTSXP);
     }
 
-    bool is_integer_literal() {
+    bool is_integer_scalar() {
         return is_integer_vector() && get_length() == 1;
     }
 
-    long int get_integer_element(int index) {
+    int get_integer_element(int index) {
         return INTEGER(get_value())[index];
-    }
-
-    bool has_integer_value(int value) {
-        return value == get_integer_element(get_index_interval().get_minimum());
     }
 
     /***************************************************************************
@@ -145,18 +121,12 @@ class RValue {
         return has_type(CPLXSXP);
     }
 
-    bool is_complex_literal() {
+    bool is_complex_scalar() {
         return is_complex_vector() && get_length() == 1;
     }
 
-    Rcomplex get_complex_element(int index) {
+    const Rcomplex& get_complex_element(int index) {
         return COMPLEX(get_value())[index];
-    }
-
-    bool has_complex_value(Rcomplex value) {
-        Rcomplex value2 =
-            get_complex_element(get_index_interval().get_minimum());
-        return value.r == value2.r && value.i == value2.i;
     }
 
     /***************************************************************************
@@ -167,16 +137,12 @@ class RValue {
         return has_type(RAWSXP);
     }
 
-    bool is_raw_literal() {
+    bool is_raw_scalar() {
         return is_raw_vector() && get_length() == 1;
     }
 
     Rbyte get_raw_element(int index) {
         return RAW_ELT(get_value(), index);
-    }
-
-    bool has_raw_value(Rbyte value) {
-        return value == get_raw_element(get_index_interval().get_minimum());
     }
 
     /***************************************************************************
@@ -191,6 +157,7 @@ class RValue {
      * LANGUAGE
      **************************************************************************/
 
+    /*
     bool is_call() const {
         return is_language();
     }
@@ -224,11 +191,13 @@ class RValue {
     bool has_arguments(int argument_count) const {
         return get_argument_count() == argument_count;
     }
+    */
 
     /***************************************************************************
      * SYMBOL
      **************************************************************************/
 
+    /*
     bool is_symbol() const {
         return has_type(SYMSXP);
     }
@@ -248,10 +217,40 @@ class RValue {
         }
         return RValue(CAR(expr));
     }
+    */
+
+    RValue subset(int index, int length) {
+        int new_begin = begin_ + index;
+        int new_end = new_begin + length;
+
+        bool correct = new_begin >= begin_ && new_begin <= end_ &&
+                       new_end >= begin_ && new_end <= end_ &&
+                       new_begin <= new_end;
+
+        if (!correct) {
+            Rf_error("incorrect subsetting of value[%d-%d] at index %d and "
+                     "length %d",
+                     begin_,
+                     end_,
+                     new_begin,
+                     new_end);
+        }
+
+        return RValue(r_value_, new_begin, new_end);
+    }
 
   private:
     SEXP r_value_;
-    Interval index_interval_;
+    int begin_;
+    int end_;
+
+    int transform_index_(int index) {
+        int new_index = begin_ + index;
+        if (new_index >= end_) {
+            Rf_error("out of bounds access");
+        }
+        return new_index;
+    }
 };
 
 #endif /* MATCHR_R_VALUE_H */

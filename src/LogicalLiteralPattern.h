@@ -18,8 +18,8 @@ class LogicalLiteralPattern: public LiteralPattern {
                   const Context& context) const override final {
         Context clone(context);
 
-        bool status =
-            value.is_logical_vector() && value.has_logical_value(get_value());
+        bool status = value.is_logical_vector() &&
+                      value.get_logical_element(0) == get_value();
 
         clone.set_status(status);
 

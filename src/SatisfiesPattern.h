@@ -22,10 +22,10 @@ class SatisfiesPattern: public Pattern {
         SEXP r_predicate = get_predicate();
 
         /* TODO: add env with .*/
-        RValue result = Rf_eval(r_predicate, r_pat_env);
+        SEXP r_result = Rf_eval(r_predicate, r_pat_env);
 
-        bool status =
-            result.is_logical_literal() && result.get_logical_element(0);
+        bool status = (TYPEOF(r_result) == LGLSXP) &&
+                      (Rf_length(r_result) == 1) && (LOGICAL(r_result)[0] != 0);
 
         clone.set_status(status);
 

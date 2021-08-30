@@ -2,7 +2,7 @@
 #define MATCHR_CONTEXT_H
 
 #include "Bindings.h"
-#include "Interval.h"
+#include "Range.h"
 #include "utilities.h"
 
 class Context {

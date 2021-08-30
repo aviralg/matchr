@@ -24,8 +24,11 @@ class ComplexLiteralPattern: public LiteralPattern {
                   const Context& context) const override final {
         Context clone(context);
 
-        bool status =
-            value.is_complex_vector() && value.has_complex_value(get_value());
+        bool status = value.is_complex_vector();
+        if (status) {
+            const Rcomplex& element = value.get_complex_element(0);
+            status = (element.r == value_.r) && (element.i == value_.i);
+        }
 
         clone.set_status(status);
 

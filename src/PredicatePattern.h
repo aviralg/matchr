@@ -20,11 +20,11 @@ class PredicatePattern: public Pattern {
 
         SEXP r_predicate = get_predicate();
 
-        RValue result =
+        SEXP r_result =
             Rf_eval(Rf_lang2(r_predicate, value.get_value()), r_pat_env);
 
-        bool status =
-            result.is_logical_literal() && result.get_logical_element(0);
+        bool status = TYPEOF(r_result) == LGLSXP && Rf_length(r_result) == 1 &&
+                      LOGICAL(r_result)[0] == 1;
 
         clone.set_status(status);
 

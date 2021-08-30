@@ -15,10 +15,6 @@ class GroupUnaryPattern: public UnaryPattern {
                   const Context& context) const override final {
         return get_sub_pattern()->match(value, r_pat_env, context);
     }
-
-    IdentifierNames get_identifier_names() const override final {
-        return get_sub_pattern()->get_identifier_names();
-    }
 };
 
 #endif /* MATCHR_GROUP_UNARY_PATTERN_H */

@@ -19,7 +19,7 @@ class IntegerLiteralPattern: public LiteralPattern {
         Context clone(context);
 
         bool status =
-            value.is_integer_vector() && value.has_integer_value(get_value());
+            value.is_integer_vector() && value.get_integer_element(get_value());
 
         clone.set_status(status);
 

@@ -18,8 +18,8 @@ class RealLiteralPattern: public LiteralPattern {
                   const Context& context) const override final {
         Context clone(context);
 
-        bool status =
-            value.is_real_vector() && value.has_real_value(get_value());
+        bool status = value.is_real_vector() &&
+                      value.get_real_element(0) == get_value();
 
         clone.set_status(status);
 

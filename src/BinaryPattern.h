@@ -33,6 +33,12 @@ class BinaryPattern: public Pattern {
         return second_sub_pattern_;
     }
 
+    IdentifierNames get_identifier_names() const override final {
+        IdentifierNames names(get_first_sub_pattern()->get_identifier_names());
+        names.merge(get_second_sub_pattern()->get_identifier_names());
+        return names;
+    }
+
   private:
     Pattern* first_sub_pattern_;
     Pattern* second_sub_pattern_;

@@ -21,9 +21,10 @@ class Clause {
 
     SEXP match(SEXP r_value, SEXP r_pat_env, SEXP r_eval_env) {
         SEXP r_result = NULL;
+        RValue value(r_value);
 
         Pattern* pattern = get_pattern();
-        Context context = pattern->match(RValue(r_value), r_pat_env);
+        Context context = pattern->match(value, r_pat_env);
 
         if (context) {
             Evaluand* evaluand = get_evaluand();

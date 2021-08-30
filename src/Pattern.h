@@ -3,7 +3,7 @@
 
 #include "Context.h"
 #include "IdentifierNames.h"
-#include "Interval.h"
+#include "Range.h"
 #include "RValue.h"
 
 class Pattern {
@@ -25,26 +25,25 @@ class Pattern {
 
     virtual IdentifierNames get_identifier_names() const = 0;
 
-    const Interval& get_match_interval() const {
-        return match_interval_;
+    const Range& get_range() const {
+        return range_;
     }
 
-    Interval& get_match_interval() {
-        return match_interval_;
+    void set_range(const Range& range) {
+        range_ = range;
     }
 
     static Pattern* create(SEXP r_expression);
 
   protected:
-    Pattern(SEXP r_expression)
-        : r_expression_(r_expression), match_interval_(false, 1, 1) {
+    Pattern(SEXP r_expression): r_expression_(r_expression), range_(1, 1) {
         // We don't need to preserve r_expression because the outermost match
         // expression is preserved already by matcher.
     }
 
   private:
     SEXP r_expression_;
-    Interval match_interval_;
+    Range range_;
 };
 
 #endif /* MATCHR_PATTERN_H */

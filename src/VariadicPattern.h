@@ -13,7 +13,7 @@ class VariadicPattern: public Pattern {
 
     virtual ~VariadicPattern() {
         for (int i = 0; i < get_size(); ++i) {
-            delete at(i);
+            delete get_pattern(i);
         }
     }
 
@@ -21,14 +21,14 @@ class VariadicPattern: public Pattern {
         return patterns_.size();
     }
 
-    Pattern* at(int index) const {
+    Pattern* get_pattern(int index) const {
         return patterns_.at(index);
     }
 
     IdentifierNames get_identifier_names() const override final {
         IdentifierNames names;
         for (int i = 0; i < get_size(); ++i) {
-            names.merge(at(i)->get_identifier_names());
+            names.merge(get_pattern(i)->get_identifier_names());
         }
         return names;
     }

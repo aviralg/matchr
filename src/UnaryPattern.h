@@ -21,6 +21,10 @@ class UnaryPattern: public Pattern {
         return sub_pattern_;
     }
 
+    IdentifierNames get_identifier_names() const override final {
+        return get_sub_pattern()->get_identifier_names();
+    }
+
   private:
     Pattern* sub_pattern_;
 };

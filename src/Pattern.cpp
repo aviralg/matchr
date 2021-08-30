@@ -12,9 +12,10 @@
 #include "RawLiteralPattern.h"
 #include "RealLiteralPattern.h"
 #include "CharacterLiteralPattern.h"
-#include "VectorSequencePattern.h"
+#include "VectorUnaryPattern.h"
 #include "WildcardPattern.h"
 #include "SatisfiesPattern.h"
+#include "SequencePattern.h"
 
 class Result {
   public:
@@ -112,6 +113,19 @@ Result create_variadic_pattern(const std::string& function_name,
     return Result(new T(r_expression, patterns));
 }
 
+template <typename T>
+Result create_sequence_pattern(const std::string& function_name,
+                               SEXP r_expression) {
+    Result result =
+        create_variadic_pattern<SequencePattern>(function_name, r_expression);
+
+    if (result.has_error()) {
+        return result;
+    }
+
+    return Result(new T(r_expression, result.get_pattern()));
+}
+
 Result create_identifier_pattern(SEXP r_expression) {
     std::string identifier(CHAR(PRINTNAME(r_expression)));
 
@@ -154,7 +168,7 @@ Result create_range_pattern(const std::string& function_name,
         }
     }
 
-    else if (length == 4) {
+    if (length == 4) {
         SEXP r_max = CADDDR(r_expression);
 
         if (TYPEOF(r_max) == INTSXP) {
@@ -219,9 +233,9 @@ Result create_helper(SEXP r_expression) {
                                                            r_expression);
         }
 
-        else if (function_name == "?") {
+        else if (function_name == "?" || function_name == "satisfies") {
             return Result(
-                new SatisfiesPattern(r_expression, CDR(r_expression)));
+                new SatisfiesPattern(r_expression, CADR(r_expression)));
 
         }
 
@@ -245,8 +259,8 @@ Result create_helper(SEXP r_expression) {
         }
 
         else if (function_name == "vector" || function_name == "vec") {
-            return create_variadic_pattern<VectorSequencePattern>(function_name,
-                                                                  r_expression);
+            return create_sequence_pattern<VectorUnaryPattern>(function_name,
+                                                               r_expression);
         }
     }
 

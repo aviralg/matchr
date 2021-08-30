@@ -18,7 +18,7 @@ class NoneVariadicPattern: public VariadicPattern {
         clone.set_failure();
 
         for (int i = 0; !clone && i < get_size(); ++i) {
-            Pattern* pat = at(i);
+            Pattern* pat = get_pattern(i);
             clone = pat->match(value, r_pat_env, context);
         }
 

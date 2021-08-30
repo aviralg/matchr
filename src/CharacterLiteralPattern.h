@@ -19,7 +19,7 @@ class CharacterLiteralPattern: public LiteralPattern {
         Context clone(context);
 
         bool status = value.is_character_vector() &&
-                      value.has_character_value(get_value());
+                      value.get_character_element(0) == get_value();
 
         clone.set_status(status);
 
