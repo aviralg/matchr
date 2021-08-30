@@ -3,14 +3,19 @@ NULL
 
 
 #' @export
-match <- function(value, ..., pat_env = parent.frame(), eval_env = parent.frame()) { # nolint
+match <- function(value,
+                  ...,
+                  pat_env = parent.frame(),
+                  eval_env = parent.frame()) {
     object <- matcher(..., pat_env = pat_env, eval_env = eval_env)
     object(value)
 }
 
 
 #' @export
-matcher <- function(..., pat_env = parent.frame(), eval_env = parent.frame()) {
+matcher <- function(...,
+                    pat_env = parent.frame(),
+                    eval_env = parent.frame()) {
 
     clauses <- list(..., . ~ stop("value did not match any pattern"))
 
