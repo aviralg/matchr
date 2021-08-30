@@ -2,7 +2,6 @@
 #include "AllVariadicPattern.h"
 #include "ComplexLiteralPattern.h"
 #include "GroupUnaryPattern.h"
-#include "IdentifierPattern.h"
 #include "IntegerLiteralPattern.h"
 #include "LogicalLiteralPattern.h"
 #include "NoneVariadicPattern.h"
@@ -126,14 +125,9 @@ Result create_sequence_pattern(const std::string& function_name,
     return Result(new T(r_expression, result.get_pattern()));
 }
 
-Result create_identifier_pattern(SEXP r_expression) {
+Result create_wildcard_pattern(SEXP r_expression) {
     std::string identifier(CHAR(PRINTNAME(r_expression)));
-
-    if (identifier == ".") {
-        return Result(new WildcardPattern(r_expression));
-    } else {
-        return Result(new IdentifierPattern(r_expression, identifier));
-    }
+    return Result(new WildcardPattern(r_expression, identifier));
 }
 
 Result create_range_pattern(const std::string& function_name,
@@ -196,7 +190,7 @@ Result create_helper(SEXP r_expression) {
     SEXPTYPE expr_type = TYPEOF(r_expression);
 
     if (expr_type == SYMSXP) {
-        return create_identifier_pattern(r_expression);
+        return create_wildcard_pattern(r_expression);
     }
 
     else if (expr_type == LGLSXP && Rf_length(r_expression) == 1) {
