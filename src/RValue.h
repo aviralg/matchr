@@ -7,16 +7,31 @@
 class RValue {
   public:
     /* TODO: check if all R values have length or not */
-    RValue(SEXP r_value)
-        : r_value_(r_value), begin_(0), end_(Rf_length(r_value)) {
+    explicit RValue(SEXP r_value)
+        : r_value_(r_value)
+        , type_(TYPEOF(r_value))
+        , begin_(0)
+        , end_(Rf_length(r_value)) {
     }
 
     RValue(SEXP r_value, int begin, int end)
-        : r_value_(r_value), begin_(begin), end_(end) {
+        : r_value_(r_value), type_(TYPEOF(r_value)), begin_(begin), end_(end) {
     }
 
     RValue(SEXPTYPE type, std::vector<RValue>& elements)
-        : r_value_(NULL), type_(type), elements_(elements) {
+        : r_value_(NULL)
+        , type_(type)
+        , elements_(elements)
+        , begin_(0)
+        , end_(elements.size()) {
+    }
+
+    RValue(SEXPTYPE type, std::vector<RValue>& elements, int begin, int end)
+        : r_value_(NULL)
+        , type_(type)
+        , elements_(elements)
+        , begin_(begin)
+        , end_(end) {
     }
 
     SEXP get_value() const {
@@ -24,7 +39,7 @@ class RValue {
     }
 
     SEXPTYPE get_type() const {
-        return TYPEOF(get_value());
+        return type_;
     }
 
     bool has_type(SEXPTYPE type) const {
@@ -67,7 +82,8 @@ class RValue {
 
     std::string get_character_element(int index) const {
         int new_index = transform_index_(index);
-        return CHAR(STRING_ELT(get_value(), new_index));
+        return is_abstract_() ? elements_[new_index].get_character_element(0)
+                              : CHAR(STRING_ELT(get_value(), new_index));
     }
 
     /***************************************************************************
@@ -84,7 +100,8 @@ class RValue {
 
     int get_logical_element(int index) const {
         int new_index = transform_index_(index);
-        return LOGICAL(get_value())[new_index];
+        return is_abstract_() ? elements_[new_index].get_logical_element(0)
+                              : LOGICAL(get_value())[new_index];
     }
 
     /***************************************************************************
@@ -101,7 +118,8 @@ class RValue {
 
     double get_real_element(int index) const {
         int new_index = transform_index_(index);
-        return REAL(get_value())[new_index];
+        return is_abstract_() ? elements_[index].get_real_element(0)
+                              : REAL(get_value())[new_index];
     }
 
     /***************************************************************************
@@ -118,7 +136,8 @@ class RValue {
 
     int get_integer_element(int index) const {
         int new_index = transform_index_(index);
-        return INTEGER(get_value())[new_index];
+        return is_abstract_() ? elements_[new_index].get_integer_element(0)
+                              : INTEGER(get_value())[new_index];
     }
 
     /***************************************************************************
@@ -135,7 +154,8 @@ class RValue {
 
     const Rcomplex& get_complex_element(int index) const {
         int new_index = transform_index_(index);
-        return COMPLEX(get_value())[new_index];
+        return is_abstract_() ? elements_[new_index].get_complex_element(0)
+                              : COMPLEX(get_value())[new_index];
     }
 
     /***************************************************************************
@@ -152,7 +172,8 @@ class RValue {
 
     Rbyte get_raw_element(int index) const {
         int new_index = transform_index_(index);
-        return RAW_ELT(get_value(), new_index);
+        return is_abstract_() ? elements_[new_index].get_raw_element(0)
+                              : RAW_ELT(get_value(), new_index);
     }
 
     /***************************************************************************
@@ -246,14 +267,24 @@ class RValue {
                      new_end);
         }
 
-        return RValue(r_value_, new_begin, new_end);
+        return is_abstract_()
+                   ? RValue(get_type(), elements_, new_begin, new_end)
+                   : RValue(r_value_, new_begin, new_end);
     }
 
     SEXP to_sexp() const {
-        if (r_value_ != NULL) {
-            return from_concrete_();
-        } else {
-            return from_abstract_();
+        /* if we are referring to the whole value, return as is. */
+        if (r_value_ != NULL && get_length() == Rf_length(r_value_)) {
+            return r_value_;
+        }
+
+        else if (is_vector()) {
+            return vector_to_sexp_();
+        }
+
+        else {
+            Rf_error("conversion of non-vector types to concrete values is not "
+                     "yet supported");
         }
     }
 
@@ -296,17 +327,13 @@ class RValue {
         return new_index;
     }
 
-    SEXP from_concrete_() const {
+    SEXP vector_to_sexp_() const {
+        SEXPTYPE type = get_type();
         int length = get_length();
-
-        /* if we are referring to the whole value, return as is. */
-        if (length == Rf_length(r_value_)) {
-            return r_value_;
-        }
 
         SEXP r_result = R_NilValue;
 
-        if (TYPEOF(r_value_) == INTSXP) {
+        if (type == INTSXP) {
             r_result = PROTECT(Rf_allocVector(INTSXP, length));
 
             for (int i = 0; i < length; ++i) {
@@ -314,7 +341,7 @@ class RValue {
             }
 
             UNPROTECT(1);
-        } else if (TYPEOF(r_value_) == REALSXP) {
+        } else if (type == REALSXP) {
             r_result = PROTECT(Rf_allocVector(REALSXP, length));
 
             for (int i = 0; i < length; ++i) {
@@ -322,7 +349,7 @@ class RValue {
             }
 
             UNPROTECT(1);
-        } else if (TYPEOF(r_value_) == LGLSXP) {
+        } else if (type == LGLSXP) {
             r_result = PROTECT(Rf_allocVector(LGLSXP, length));
 
             for (int i = 0; i < length; ++i) {
@@ -330,7 +357,7 @@ class RValue {
             }
 
             UNPROTECT(1);
-        } else if (TYPEOF(r_value_) == RAWSXP) {
+        } else if (type == RAWSXP) {
             r_result = PROTECT(Rf_allocVector(RAWSXP, length));
 
             for (int i = 0; i < length; ++i) {
@@ -338,7 +365,7 @@ class RValue {
             }
 
             UNPROTECT(1);
-        } else if (TYPEOF(r_value_) == CPLXSXP) {
+        } else if (type == CPLXSXP) {
             r_result = PROTECT(Rf_allocVector(CPLXSXP, length));
 
             for (int i = 0; i < length; ++i) {
@@ -353,8 +380,8 @@ class RValue {
         return r_result;
     }
 
-    SEXP from_abstract_() const {
-        return NULL;
+    bool is_abstract_() const {
+        return r_value_ == NULL;
     }
 };
 

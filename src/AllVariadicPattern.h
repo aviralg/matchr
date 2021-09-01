@@ -14,7 +14,7 @@ class AllVariadicPattern: public VariadicPattern {
 
         for (int i = 0; context && i < get_size(); ++i) {
             Pattern* pat = get_pattern(i);
-            context = pat->match(value, r_pat_env);
+            context = context.merge(pat->match(value, r_pat_env));
         }
 
         return context;

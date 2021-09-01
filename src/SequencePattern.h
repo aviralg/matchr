@@ -121,12 +121,16 @@ class SequencePattern: public VariadicPattern {
                 RValue new_value =
                     value.subset(consumed, states[index].current_size);
 
-                Context current_context = pattern->match(new_value, r_pat_env);
+                Context context = pattern->match(new_value, r_pat_env);
+
+                if (index != 0) {
+                    context = context.merge(states[index - 1].context);
+                }
 
                 /* if matching succeeds, then break and try the next pattern in
                    sequence. */
-                if (current_context) {
-                    states[index].context = current_context;
+                if (context) {
+                    states[index].context = context;
                     ++index;
                     break;
                 }
@@ -141,7 +145,19 @@ class SequencePattern: public VariadicPattern {
         }
 
         /* if matching did not succeed; return a failure context */
-        return Context(index == pattern_count);
+        if (index != pattern_count) {
+            return Context(false);
+        }
+
+        for (int index = 0; index < pattern_count; ++index) {
+            std::cout << states[index].current_size << "["
+                      << states[index].consumed << "]"
+                      << " | ";
+        }
+
+        std::cout << std::endl;
+
+        return states[pattern_count - 1].context;
     }
 
   private:

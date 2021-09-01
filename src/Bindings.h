@@ -8,7 +8,7 @@
 #include "Optional.h"
 #include "utilities.h"
 #include "RValue.h"
-
+#include <iostream>
 class Bindings {
   public:
     struct Cell {
@@ -31,7 +31,7 @@ class Bindings {
         return cells_[index];
     }
 
-    void bind(const std::string& identifier, SEXP r_value) {
+    void bind(const std::string& identifier, RValue r_value) {
         int index;
 
         for (index = 0; index < get_size(); ++index) {
@@ -53,13 +53,18 @@ class Bindings {
     SEXP as_environment(SEXP r_parent) const {
         SEXP r_environment = PROTECT(new_dot_env(true, get_size(), r_parent));
 
+        std::cout << "here begin" << std::endl;
+
         for (int index = 0; index < get_size(); ++index) {
             const Cell& cell = get_cell(index);
+            std::cout << cell.identifier << std::endl;
             SEXP r_symbol = PROTECT(Rf_install(cell.identifier.c_str()));
             SEXP r_value = PROTECT(cell.r_value.to_sexp());
             Rf_defineVar(r_symbol, r_value, r_environment);
             UNPROTECT(2);
         }
+
+        std::cout << "here end" << std::endl;
 
         UNPROTECT(1);
 
@@ -79,8 +84,8 @@ class Bindings {
         int size_b = bindings.get_size();
 
         while (a < size_a && b < size_b) {
-            Cell cell_a = get_cell(a);
-            Cell cell_b = bindings.get_cell(b);
+            const Cell& cell_a = get_cell(a);
+            const Cell& cell_b = bindings.get_cell(b);
 
             if (cell_a.identifier == cell_b.identifier) {
                 if (cell_a.r_value != cell_b.r_value) {
@@ -105,13 +110,13 @@ class Bindings {
         }
 
         while (a < size_a) {
-            Cell cell_a = get_cell(a);
+            const Cell& cell_a = get_cell(a);
             cells.push_back(cell_a);
             ++a;
         }
 
         while (b < size_b) {
-            Cell cell_b = bindings.get_cell(b);
+            const Cell& cell_b = bindings.get_cell(b);
             cells.push_back(cell_b);
             ++b;
         }

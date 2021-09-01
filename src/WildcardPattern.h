@@ -18,7 +18,7 @@ class WildcardPattern: public Pattern {
         Context context(true);
 
         if (!dot_) {
-            context.get_bindings().bind(get_name(), value.get_value());
+            context.get_bindings().bind(get_name(), value);
         }
 
         return context;

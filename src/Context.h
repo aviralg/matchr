@@ -7,12 +7,26 @@
 
 class Context {
   public:
-    explicit Context(bool success)
-        : success_(success), bindings_(), match_count_(-1) {
+    explicit Context(bool success): success_(success), bindings_() {
     }
 
-    explicit Context(bool success, const Bindings& bindings)
-        : success_(success), bindings_(bindings), match_count_(-1) {
+    explicit Context(const Bindings& bindings)
+        : success_(true), bindings_(bindings) {
+    }
+
+    Context merge(const Context& context) {
+        if (is_failure() || context.is_failure()) {
+            return Context(false);
+        }
+
+        Optional<Bindings> bindings =
+            get_bindings().merge(context.get_bindings());
+
+        if (bindings) {
+            return Context(bindings.get_value());
+        } else {
+            return Context(false);
+        }
     }
 
     /* TODO: add move assignment and make it efficient */
@@ -58,53 +72,9 @@ class Context {
         return bindings_;
     }
 
-    int get_match_count() const {
-        return match_count_;
-    }
-
-    void set_match_count(int match_count) {
-        match_count_ = match_count;
-    }
-
-    // void bind(const std::string& identifier, SEXP r_expression) {
-    //     bindings_[identifier] = r_expression;
-    // }
-    //
-    // SEXP lookup(const std::string identifier) {
-    //     auto iter = bindings_.find(identifier);
-    //
-    //     if (iter == bindings_.end()) {
-    //         Rf_errorcall(
-    //             R_NilValue, "%s not bound in context", identifier.c_str());
-    //     }
-    //
-    //     return iter->second;
-    // }
-    //
-    // SEXP as_environment(SEXP parent) {
-    //     SEXP hash = PROTECT(ScalarLogical(true));
-    //     SEXP size = PROTECT(ScalarInteger(bindings_.size()));
-    //
-    //     SEXP environment = PROTECT(new_dot_env(hash, parent, size));
-    //
-    //     for (auto& binding: bindings_) {
-    //         SEXP symbol = Rf_install(binding.first.c_str());
-    //         Rf_defineVar(symbol, binding.second, environment);
-    //     }
-    //
-    //     UNPROTECT(3);
-    //
-    //     return environment;
-    // };
-    //
-    // bool is_mergeable(const Context& context) const {
-    //     get_bindings
-    // }
-
   private:
     bool success_;
     Bindings bindings_;
-    int match_count_;
 };
 
 #endif /* MATCHR_CONTEXT_H */

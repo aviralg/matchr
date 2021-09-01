@@ -40,39 +40,60 @@ class RangeUnaryPattern: public UnaryPattern {
   private:
     Context merge(const std::vector<Context>& contexts, SEXPTYPE type) const {
         std::vector<std::string> identifiers;
-        std::vector<Bindings::Cell> cells;
-        std::vector<std::vector<RValue>> r_values_vec;
+        std::vector<std::vector<RValue>> r_values;
 
         for (int i = 0; i < contexts.size(); ++i) {
             const Bindings& bindings = contexts[i].get_bindings();
 
-            for (int j = 0; j < bindings.get_size(); ++j) {
-                Bindings::Cell cell = bindings.get_cell(j);
+            int a = 0;
+            int size_a = identifiers.size();
 
-                for (int k = 0; k < identifiers.size(); ++k) {
-                    if (identifiers[k] == cell.identifier) {
-                        r_values_vec[k].push_back(cell.r_value);
-                        break;
-                    } else if (identifiers[k] > cell.identifier) {
-                        identifiers.insert(identifiers.begin() + k,
-                                           cell.identifier);
-                        r_values_vec.insert(r_values_vec.begin() + k,
-                                            {cell.r_value});
-                        break;
-                    }
+            int b = 0;
+            int size_b = bindings.get_size();
+
+            while (a < size_a && b < size_b) {
+                const std::string& identifier = identifiers[a];
+                const Bindings::Cell& cell_b = bindings.get_cell(b);
+
+                if (identifier == cell_b.identifier) {
+                    r_values[a].push_back(cell_b.r_value);
+                    ++a;
+                    ++b;
                 }
+
+                else if (identifier < cell_b.identifier) {
+                    ++a;
+                }
+
+                else {
+                    identifiers.insert(identifiers.begin() + a,
+                                       cell_b.identifier);
+                    r_values.insert(r_values.begin() + a, {cell_b.r_value});
+                    ++a;
+                    ++size_a;
+                    ++b;
+                }
+            }
+
+            while (b < size_b) {
+                const Bindings::Cell& cell_b = bindings.get_cell(b);
+
+                identifiers.push_back(cell_b.identifier);
+                r_values.push_back({cell_b.r_value});
+                ++b;
             }
         }
 
+        std::vector<Bindings::Cell> cells;
         cells.reserve(identifiers.size());
         for (int i = 0; i < identifiers.size(); ++i) {
             Bindings::Cell cell{.identifier = identifiers[i],
-                                .r_value = RValue(type, r_values_vec[i])};
+                                .r_value = RValue(type, r_values[i])};
 
             cells.push_back(cell);
         }
 
-        return Context(true, Bindings(cells));
+        return Context(Bindings(cells));
     }
 };
 
