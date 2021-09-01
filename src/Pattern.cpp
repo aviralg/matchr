@@ -16,6 +16,13 @@
 #include "SatisfiesPattern.h"
 #include "SequencePattern.h"
 #include "WhenUnaryPattern.h"
+#include "IntegerUnaryPattern.h"
+#include "RealUnaryPattern.h"
+#include "LogicalUnaryPattern.h"
+#include "RawUnaryPattern.h"
+#include "ListUnaryPattern.h"
+#include "LanguageUnaryPattern.h"
+#include "CharacterUnaryPattern.h"
 
 class Result {
   public:
@@ -379,6 +386,42 @@ Result create_helper(SEXP r_expression) {
 
         else if (function_name == "vector" || function_name == "vec") {
             return parse_greedy_pattern_sequence<VectorUnaryPattern>(
+                function_name, r_expression);
+        }
+
+        else if (function_name == "integer" || function_name == "int") {
+            return parse_greedy_pattern_sequence<IntegerUnaryPattern>(
+                function_name, r_expression);
+        }
+
+        else if (function_name == "double" || function_name == "dbl" ||
+                 function_name == "real") {
+            return parse_greedy_pattern_sequence<RealUnaryPattern>(
+                function_name, r_expression);
+        }
+
+        else if (function_name == "logical" || function_name == "lgl") {
+            return parse_greedy_pattern_sequence<LogicalUnaryPattern>(
+                function_name, r_expression);
+        }
+
+        else if (function_name == "raw") {
+            return parse_greedy_pattern_sequence<RawUnaryPattern>(function_name,
+                                                                  r_expression);
+        }
+
+        else if (function_name == "character" || function_name == "chr") {
+            return parse_greedy_pattern_sequence<CharacterUnaryPattern>(
+                function_name, r_expression);
+        }
+
+        else if (function_name == "list") {
+            return parse_greedy_pattern_sequence<ListUnaryPattern>(
+                function_name, r_expression);
+        }
+
+        else if (function_name == "language" || function_name == "lang") {
+            return parse_greedy_pattern_sequence<LanguageUnaryPattern>(
                 function_name, r_expression);
         }
     }
