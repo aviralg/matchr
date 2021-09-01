@@ -5,6 +5,6 @@
 
 void initialize_utilities(SEXP r_package_environment);
 
-SEXP new_dot_env(SEXP hash, SEXP parent, SEXP size);
+SEXP new_dot_env(bool hash, int size, SEXP r_parent);
 
 #endif /* MATCHR_UTILITIES_H */
