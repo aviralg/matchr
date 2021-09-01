@@ -129,6 +129,110 @@ Result create_variadic_pattern(const std::string& function_name,
     return Result(new T(r_expression, patterns));
 }
 
+std::tuple<int, int> parse_range(SEXP r_expression) {
+    std::string identifier = CHAR(PRINTNAME(r_expression));
+
+    if (identifier[0] != '.' || identifier[1] != '.' || identifier[2] != '.') {
+        return {-1, -1};
+    }
+
+    int length = identifier.size();
+    int i = 3;
+    int min = 0;
+
+    if (i == length) {
+        return {0, 0};
+    }
+
+    for (; i < length && isdigit(identifier[i]); ++i) {
+        min = min * 10 + (identifier[i] - '0');
+    }
+
+    if (i < length && identifier[i] != '_') {
+        return {-1, -1};
+    }
+
+    if (i == length) {
+        return {min, INT_MAX};
+    }
+
+    /* for _ */
+    ++i;
+
+    /* if the pattern is ..<min>_ */
+    if (i == length) {
+        return {-1, -1};
+    }
+
+    int max = 0;
+    for (; i < length && isdigit(identifier[i]); ++i) {
+        max = max * 10 + (identifier[i] - '0');
+    }
+
+    if (i != length) {
+        return {-1, -1};
+    }
+
+    return {min, max};
+}
+
+template <typename T>
+Result parse_greedy_pattern_sequence(const std::string& function_name,
+                                     SEXP r_expression) {
+    std::vector<Pattern*> patterns;
+
+    bool range = false;
+    for (SEXP r_tail = CDR(r_expression); r_tail != R_NilValue;
+         r_tail = CDR(r_tail)) {
+        SEXP r_head = CAR(r_tail);
+
+        if (TYPEOF(r_head) == SYMSXP) {
+            int min;
+            int max;
+
+            std::tie(min, max) = parse_range(r_head);
+
+            if (min != -1 && max != -1) {
+                if (!range) {
+                    for (int i = 0; i < patterns.size(); ++i) {
+                        delete patterns[i];
+                    }
+                    return Result("expected pattern, not ...");
+                }
+
+                if (min < 0 || max < 0 || max < min) {
+                    for (int i = 0; i < patterns.size(); ++i) {
+                        delete patterns[i];
+                    }
+                    return Result("invalid minimum or maximum for range");
+                }
+
+                Pattern* pattern =
+                    new RangeUnaryPattern(r_head, patterns.back(), min, max);
+                patterns.back() = pattern;
+                range = false;
+                continue;
+            }
+        }
+
+        Result result = create_helper(r_head);
+
+        if (result.has_error()) {
+            for (int i = 0; i < patterns.size(); ++i) {
+                delete patterns[i];
+            }
+            patterns.clear();
+            return result;
+        }
+
+        patterns.push_back(result.get_pattern());
+        range = true;
+    }
+
+    return Result(
+        new T(r_expression, new SequencePattern(CDR(r_expression), patterns)));
+}
+
 template <typename T>
 Result create_sequence_pattern(const std::string& function_name,
                                SEXP r_expression) {
@@ -274,8 +378,8 @@ Result create_helper(SEXP r_expression) {
         }
 
         else if (function_name == "vector" || function_name == "vec") {
-            return create_sequence_pattern<VectorUnaryPattern>(function_name,
-                                                               r_expression);
+            return parse_greedy_pattern_sequence<VectorUnaryPattern>(
+                function_name, r_expression);
         }
     }
 
