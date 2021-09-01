@@ -15,9 +15,7 @@ class RangeUnaryPattern: public UnaryPattern {
         set_range(Range(minimum, maximum));
     }
 
-    Context match(RValue value,
-                  SEXP r_pat_env,
-                  const Context& context) const override final {
+    Context match(RValue value, SEXP r_pat_env) const override final {
         int length = value.get_length();
 
         std::vector<Context> contexts;
@@ -27,7 +25,7 @@ class RangeUnaryPattern: public UnaryPattern {
 
         for (int i = 0; i < length; ++i) {
             RValue new_value = value.extract(i);
-            Context result = pattern->match(new_value, r_pat_env, context);
+            Context result = pattern->match(new_value, r_pat_env);
 
             if (!result) {
                 return result;

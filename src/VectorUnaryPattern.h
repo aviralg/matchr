@@ -11,17 +11,12 @@ class VectorUnaryPattern: public UnaryPattern {
         : UnaryPattern(r_expression, sub_pattern) {
     }
 
-    Context match(RValue value,
-                  SEXP r_pat_env,
-                  const Context& context) const override final {
-        Context clone(context);
-
+    Context match(RValue value, SEXP r_pat_env) const override final {
         if (!(value.is_vector())) {
-            clone.set_failure();
-            return clone;
+            return Context(false);
         }
 
-        return get_sub_pattern()->match(value, r_pat_env, context);
+        return get_sub_pattern()->match(value, r_pat_env);
     }
 };
 

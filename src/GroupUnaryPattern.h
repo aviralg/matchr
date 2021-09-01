@@ -10,10 +10,8 @@ class GroupUnaryPattern: public UnaryPattern {
         : UnaryPattern(r_expression, sub_pattern) {
     }
 
-    Context match(RValue value,
-                  SEXP r_pat_env,
-                  const Context& context) const override final {
-        return get_sub_pattern()->match(value, r_pat_env, context);
+    Context match(RValue value, SEXP r_pat_env) const override final {
+        return get_sub_pattern()->match(value, r_pat_env);
     }
 };
 

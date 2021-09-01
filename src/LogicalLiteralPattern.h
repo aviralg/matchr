@@ -13,17 +13,11 @@ class LogicalLiteralPattern: public LiteralPattern {
         return value_;
     }
 
-    Context match(RValue value,
-                  SEXP r_pat_env,
-                  const Context& context) const override final {
-        Context clone(context);
-
+    Context match(RValue value, SEXP r_pat_env) const override final {
         bool status = value.is_logical_vector() &&
                       value.get_logical_element(0) == get_value();
 
-        clone.set_status(status);
-
-        return clone;
+        return Context(status);
     }
 
   private:

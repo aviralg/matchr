@@ -14,18 +14,14 @@ class WildcardPattern: public Pattern {
         return name_;
     }
 
-    Context match(RValue value,
-                  SEXP r_pat_env,
-                  const Context& context) const override final {
-        Context clone(context);
+    Context match(RValue value, SEXP r_pat_env) const override final {
+        Context context(true);
 
         if (!dot_) {
-            clone.get_bindings().bind(get_name(), value.get_value());
+            context.get_bindings().bind(get_name(), value.get_value());
         }
 
-        clone.set_success();
-
-        return clone;
+        return context;
     }
 
     IdentifierNames get_identifier_names() const override final {

@@ -9,19 +9,15 @@ class AnyVariadicPattern: public VariadicPattern {
         : VariadicPattern(r_expression, patterns) {
     }
 
-    Context match(RValue value,
-                  SEXP r_pat_env,
-                  const Context& context) const override final {
-        Context clone(context);
+    Context match(RValue value, SEXP r_pat_env) const override final {
+        Context context(false);
 
-        clone.set_failure();
-
-        for (int i = 0; !clone && i < get_size(); ++i) {
+        for (int i = 0; i < get_size() && !context; ++i) {
             Pattern* pat = get_pattern(i);
-            clone = pat->match(value, r_pat_env, context);
+            context = pat->match(value, r_pat_env);
         }
 
-        return clone;
+        return context;
     }
 };
 

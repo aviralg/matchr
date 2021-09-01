@@ -19,20 +19,14 @@ class ComplexLiteralPattern: public LiteralPattern {
         return lhs.r == rhs.r && lhs.i == rhs.i;
     }
 
-    Context match(RValue value,
-                  SEXP r_pat_env,
-                  const Context& context) const override final {
-        Context clone(context);
-
+    Context match(RValue value, SEXP r_pat_env) const override final {
         bool status = value.is_complex_vector();
         if (status) {
             const Rcomplex& element = value.get_complex_element(0);
             status = (element.r == value_.r) && (element.i == value_.i);
         }
 
-        clone.set_status(status);
-
-        return clone;
+        return Context(status);
     }
 
   private:

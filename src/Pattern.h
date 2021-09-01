@@ -15,13 +15,7 @@ class Pattern {
         return r_expression_;
     }
 
-    virtual Context match(RValue value, SEXP r_pat_env) const {
-        Context context(true);
-        return match(value, r_pat_env, context);
-    }
-
-    virtual Context
-    match(RValue value, SEXP r_pat_env, const Context& context) const = 0;
+    virtual Context match(RValue value, SEXP r_pat_env) const = 0;
 
     virtual IdentifierNames get_identifier_names() const = 0;
 

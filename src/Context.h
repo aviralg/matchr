@@ -15,7 +15,6 @@ class Context {
         : success_(success), bindings_(bindings), match_count_(-1) {
     }
 
-
     /* TODO: add move assignment and make it efficient */
     Context& operator=(const Context& context) {
         bindings_ = context.bindings_;

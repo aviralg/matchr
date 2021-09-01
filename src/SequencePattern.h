@@ -49,11 +49,7 @@ class SequencePattern: public VariadicPattern {
         std::cout << std::endl;
     }
 
-    Context match(RValue value,
-                  SEXP r_pat_env,
-                  const Context& context) const override final {
-        Context clone(context);
-
+    Context match(RValue value, SEXP r_pat_env) const override final {
         int input_size = value.get_length();
         int pattern_count = get_size();
 
@@ -61,8 +57,7 @@ class SequencePattern: public VariadicPattern {
            number of elements that can be matched by the pattern, then matching
            fails; return early.*/
         if (!get_range().contains(input_size)) {
-            clone.set_failure();
-            return clone;
+            return Context(false);
         }
 
         struct State {
@@ -126,8 +121,7 @@ class SequencePattern: public VariadicPattern {
                 RValue new_value =
                     value.subset(consumed, states[index].current_size);
 
-                Context current_context =
-                    pattern->match(new_value, r_pat_env, Context(true));
+                Context current_context = pattern->match(new_value, r_pat_env);
 
                 /* if matching succeeds, then break and try the next pattern in
                    sequence. */
@@ -146,9 +140,8 @@ class SequencePattern: public VariadicPattern {
             }
         }
 
-        /* matching did not succeed; return a failure context */
-        clone.set_status(index == pattern_count);
-        return clone;
+        /* if matching did not succeed; return a failure context */
+        return Context(index == pattern_count);
     }
 
   private:

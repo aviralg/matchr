@@ -13,11 +13,7 @@ class PredicatePattern: public Pattern {
         return r_predicate_;
     }
 
-    Context match(RValue value,
-                  SEXP r_pat_env,
-                  const Context& context) const override final {
-        Context clone(context);
-
+    Context match(RValue value, SEXP r_pat_env) const override final {
         SEXP r_predicate = get_predicate();
 
         SEXP r_result =
@@ -26,9 +22,7 @@ class PredicatePattern: public Pattern {
         bool status = TYPEOF(r_result) == LGLSXP && Rf_length(r_result) == 1 &&
                       LOGICAL(r_result)[0] == 1;
 
-        clone.set_status(status);
-
-        return clone;
+        return Context(status);
     }
 
     IdentifierNames get_identifier_names() const override final {
