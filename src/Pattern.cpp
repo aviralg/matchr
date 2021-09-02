@@ -25,6 +25,7 @@
 #include "CharacterUnaryPattern.h"
 #include "NullLiteralPattern.h"
 #include "PairlistUnaryPattern.h"
+#include "ClosureTernaryPattern.h"
 
 class Result {
   public:
@@ -452,6 +453,11 @@ Result create_helper(SEXP r_expression) {
 
         else if (function_name == "pairlist" || function_name == "pair") {
             return parse_greedy_pattern_sequence<PairlistUnaryPattern>(
+                function_name, r_expression);
+        }
+
+        else if (function_name == "closure") {
+            return parse_ternary_pattern_sequence<ClosureTernaryPattern>(
                 function_name, r_expression);
         }
 
