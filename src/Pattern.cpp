@@ -380,7 +380,11 @@ Result create_range_pattern(const std::string& function_name,
 Result create_helper(SEXP r_expression) {
     SEXPTYPE expr_type = TYPEOF(r_expression);
 
-    if (expr_type == SYMSXP) {
+    if (expr_type == NILSXP) {
+        return Result(new NullLiteralPattern(r_expression));
+    }
+
+    else if (expr_type == SYMSXP) {
         return create_wildcard_pattern(r_expression);
     }
 
