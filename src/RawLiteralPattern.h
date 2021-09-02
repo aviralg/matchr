@@ -15,7 +15,7 @@ class RawLiteralPattern: public LiteralPattern {
 
     Context match(RValue value, SEXP r_pat_env) const override final {
         bool status =
-            value.is_raw_vector() && value.get_raw_element(0) == get_value();
+            value.is_raw_scalar() && value.get_raw_element(0) == get_value();
 
         return Context(status);
     }

@@ -14,7 +14,7 @@ class LogicalLiteralPattern: public LiteralPattern {
     }
 
     Context match(RValue value, SEXP r_pat_env) const override final {
-        bool status = value.is_logical_vector() &&
+        bool status = value.is_logical_scalar() &&
                       value.get_logical_element(0) == get_value();
 
         return Context(status);

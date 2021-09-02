@@ -15,7 +15,7 @@ class IntegerLiteralPattern: public LiteralPattern {
 
     Context match(RValue value, SEXP r_pat_env) const override final {
         bool status =
-            value.is_integer_vector() && value.get_integer_element(get_value());
+            value.is_integer_scalar() && value.get_integer_element(get_value());
 
         return Context(status);
     }
