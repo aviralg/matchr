@@ -406,7 +406,7 @@ Result create_helper(SEXP r_expression) {
     else if (expr_type == STRSXP && Rf_length(r_expression) == 1) {
         const char* value = NULL;
         SEXP r_char = STRING_ELT(r_expression, 0);
-        if (r_char != NULL) {
+        if (r_char != NA_STRING) {
             value = CHAR(r_char);
         }
 

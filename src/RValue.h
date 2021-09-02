@@ -80,10 +80,19 @@ class RValue {
         return is_character_vector() && get_length() == 1;
     }
 
-    std::string get_character_element(int index) const {
+    const char* get_character_element(int index) const {
         int new_index = transform_index_(index);
-        return is_abstract_() ? elements_[new_index].get_character_element(0)
-                              : CHAR(STRING_ELT(get_value(), new_index));
+        if (is_abstract_()) {
+            return elements_[new_index].get_character_element(0);
+        }
+
+        SEXP r_char = STRING_ELT(get_value(), new_index);
+
+        if (r_char == NA_STRING) {
+            return NULL;
+        }
+
+        return CHAR(r_char);
     }
 
     /***************************************************************************
