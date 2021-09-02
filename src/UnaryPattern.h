@@ -11,6 +11,7 @@ class UnaryPattern: public Pattern {
     }
 
     virtual ~UnaryPattern() {
+        delete sub_pattern_;
     }
 
     const Pattern* get_sub_pattern() const {

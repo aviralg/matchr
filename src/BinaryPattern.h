@@ -15,6 +15,8 @@ class BinaryPattern: public Pattern {
     }
 
     virtual ~BinaryPattern() {
+        delete first_sub_pattern_;
+        delete second_sub_pattern_;
     }
 
     const Pattern* get_first_sub_pattern() const {
