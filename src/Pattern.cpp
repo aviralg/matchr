@@ -87,6 +87,36 @@ Result create_binary_pattern(const std::string& function_name,
 }
 
 template <typename T>
+Result parse_ternary_pattern_sequence(const std::string& function_name,
+                                      SEXP r_expression) {
+    Result first = create_helper(CADR(r_expression));
+
+    if (first.has_error()) {
+        return first;
+    }
+
+    Result second = create_helper(CADDR(r_expression));
+
+    if (second.has_error()) {
+        delete first.get_pattern();
+        return second;
+    }
+
+    Result third = create_helper(CADDDR(r_expression));
+
+    if (third.has_error()) {
+        delete first.get_pattern();
+        delete second.get_pattern();
+        return third;
+    }
+
+    return Result(new T(r_expression,
+                        first.get_pattern(),
+                        second.get_pattern(),
+                        third.get_pattern()));
+}
+
+template <typename T>
 Result create_unary_pattern(const std::string& function_name,
                             SEXP r_expression) {
     Result inner = create_helper(CADR(r_expression));
