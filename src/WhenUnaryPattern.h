@@ -7,8 +7,8 @@
 class WhenUnaryPattern: public UnaryPattern {
   public:
     explicit WhenUnaryPattern(SEXP r_expression,
-                              Pattern* pattern,
-                              SEXP r_predicate)
+                              SEXP r_predicate,
+                              Pattern* pattern)
         : UnaryPattern(r_expression, pattern), r_predicate_(r_predicate) {
     }
 
@@ -17,25 +17,17 @@ class WhenUnaryPattern: public UnaryPattern {
     }
 
     Context match(RValue value, SEXP r_pat_env) const override final {
-        Context context = get_sub_pattern()->match(value, r_pat_env);
-
-        if (!context) {
-            return context;
-        }
-
-        SEXP r_eval_env = context.get_bindings().as_environment(r_pat_env);
-
-        /* TODO: add env with .*/
-        SEXP r_result = Rf_eval(get_predicate(), r_eval_env);
+        /* TODO: add env with . */
+        SEXP r_result = Rf_eval(get_predicate(), r_pat_env);
 
         bool status = (TYPEOF(r_result) == LGLSXP) &&
                       (Rf_length(r_result) == 1) && (LOGICAL(r_result)[0] != 0);
 
-        if (status) {
-            return context;
+        if (!status) {
+            return Context(false);
         }
 
-        return Context(false);
+        return get_sub_pattern()->match(value, r_pat_env);
     }
 
   private:

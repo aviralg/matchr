@@ -6,16 +6,16 @@
 #include "LogicalLiteralPattern.h"
 #include "NoneVariadicPattern.h"
 #include "AnyVariadicPattern.h"
-#include "PredicatePattern.h"
 #include "RangeUnaryPattern.h"
 #include "RawLiteralPattern.h"
 #include "RealLiteralPattern.h"
 #include "CharacterLiteralPattern.h"
 #include "VectorUnaryPattern.h"
 #include "WildcardPattern.h"
-#include "SatisfiesPattern.h"
 #include "SequencePattern.h"
 #include "WhenUnaryPattern.h"
+#include "ThenUnaryPattern.h"
+#include "WithUnaryPattern.h"
 #include "IntegerUnaryPattern.h"
 #include "RealUnaryPattern.h"
 #include "LogicalUnaryPattern.h"
@@ -95,10 +95,25 @@ Result create_unary_pattern(const std::string& function_name,
     return Result(new T(r_expression, inner.get_pattern()));
 }
 
-Result create_when_pattern(const std::string& function_name,
+Result parse_when_pattern(const std::string& function_name,
                            SEXP r_expression) {
     if (Rf_length(r_expression) != 3) {
         return Result("incorrect number of arguments passed to when");
+    }
+
+    Result inner = create_helper(CADDR(r_expression));
+
+    if (inner.has_error()) {
+        return inner;
+    }
+
+    return Result(new WhenUnaryPattern(
+        r_expression, CADR(r_expression), inner.get_pattern()));
+}
+
+Result parse_then_pattern(const std::string& function_name, SEXP r_expression) {
+    if (Rf_length(r_expression) != 3) {
+        return Result("incorrect number of arguments passed to then");
     }
 
     Result inner = create_helper(CADR(r_expression));
@@ -107,8 +122,23 @@ Result create_when_pattern(const std::string& function_name,
         return inner;
     }
 
-    return Result(new WhenUnaryPattern(
+    return Result(new ThenUnaryPattern(
         r_expression, inner.get_pattern(), CADDR(r_expression)));
+}
+
+Result parse_with_pattern(const std::string& function_name, SEXP r_expression) {
+    if (Rf_length(r_expression) != 3) {
+        return Result("incorrect number of arguments passed to with");
+    }
+
+    Result inner = create_helper(CADDR(r_expression));
+
+    if (inner.has_error()) {
+        return inner;
+    }
+
+    return Result(new WithUnaryPattern(
+        r_expression, CADR(r_expression), inner.get_pattern()));
 }
 
 template <typename T>
@@ -355,18 +385,16 @@ Result create_helper(SEXP r_expression) {
                                                            r_expression);
         }
 
-        else if (function_name == "?" || function_name == "satisfies") {
-            return Result(
-                new SatisfiesPattern(r_expression, CADR(r_expression)));
-
-        }
-
         else if (function_name == "when") {
-            return create_when_pattern(function_name, r_expression);
+            return parse_when_pattern(function_name, r_expression);
         }
 
-        else if (function_name == "range") {
-            return create_range_pattern(function_name, r_expression);
+        else if (function_name == "then") {
+            return parse_then_pattern(function_name, r_expression);
+        }
+
+        else if (function_name == "with") {
+            return parse_with_pattern(function_name, r_expression);
         }
 
         else if (function_name == "&&" || function_name == "all") {
