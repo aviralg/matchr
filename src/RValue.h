@@ -193,45 +193,61 @@ class RValue {
         return has_type(VECSXP);
     }
 
+    RValue get_list_element(int index) const {
+        int new_index = transform_index_(index);
+
+        return is_abstract_() ? elements_[new_index]
+                              : RValue(VECTOR_ELT(get_value(), new_index));
+    }
+
+    /***************************************************************************
+     * CLOSURE
+     **************************************************************************/
+
+    bool is_closure() const {
+        return has_type(CLOSXP);
+    }
+
+    RValue get_closure_formals() const {
+        return RValue(FORMALS(get_value()));
+    }
+
+    RValue get_closure_body() const {
+        return RValue(BODY(get_value()));
+    }
+
+    RValue get_closure_environment() const {
+        return RValue(CLOENV(get_value()));
+    }
+
     /***************************************************************************
      * LANGUAGE
      **************************************************************************/
-
-    /*
-    bool is_call() const {
-        return is_language();
-    }
 
     bool is_language() const {
         return has_type(LANGSXP);
     }
 
-    bool is_call(const std::string& name, int argument_count) const {
-        if (!is_language()) {
-            return false;
+    RValue get_language_element(int index) const {
+        int new_index = transform_index_(index);
+
+        if (is_abstract_()) {
+            return elements_[new_index];
         }
 
-        const RValue value(get_function_name());
-
-        if (!value.is_symbol(name)) {
-            return false;
+        int cur_index = 0;
+        for (SEXP r_result = get_value(); r_result != R_NilValue;
+             r_result = CDR(r_result), ++cur_index) {
+            if (cur_index == new_index) {
+                return RValue(CAR(r_result));
+            }
         }
 
-        return has_arguments(argument_count);
+        Rf_error("attempt to extract element at position %d in a %d element "
+                 "language expression",
+                 new_index,
+                 get_length());
     }
-
-    RValue get_function_name() const {
-        return RValue(CAR(get_value()));
-    }
-
-    int get_argument_count() const {
-        return get_length() - 1;
-    }
-
-    bool has_arguments(int argument_count) const {
-        return get_argument_count() == argument_count;
-    }
-    */
 
     /***************************************************************************
      * SYMBOL
@@ -300,6 +316,8 @@ class RValue {
     RValue extract(int index) {
         if (is_vector()) {
             return subset(index, 1);
+        } else if (get_type() == LANGSXP) {
+            return get_language_element(index);
         } else {
             /* TODO: support lists, envs, etc. */
             Rf_error("extract not supported for non vector values");
