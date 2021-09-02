@@ -23,6 +23,7 @@
 #include "ListUnaryPattern.h"
 #include "LanguageUnaryPattern.h"
 #include "CharacterUnaryPattern.h"
+#include "PairlistUnaryPattern.h"
 
 class Result {
   public:
@@ -445,6 +446,11 @@ Result create_helper(SEXP r_expression) {
 
         else if (function_name == "list") {
             return parse_greedy_pattern_sequence<ListUnaryPattern>(
+                function_name, r_expression);
+        }
+
+        else if (function_name == "pairlist" || function_name == "pair") {
+            return parse_greedy_pattern_sequence<PairlistUnaryPattern>(
                 function_name, r_expression);
         }
 
