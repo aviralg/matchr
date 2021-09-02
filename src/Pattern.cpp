@@ -23,6 +23,7 @@
 #include "ListUnaryPattern.h"
 #include "LanguageUnaryPattern.h"
 #include "CharacterUnaryPattern.h"
+#include "NullLiteralPattern.h"
 #include "PairlistUnaryPattern.h"
 
 class Result {
