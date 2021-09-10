@@ -128,7 +128,7 @@ class RValue {
     double get_real_element(int index) const {
         int new_index = transform_index_(index);
         return is_abstract_() ? elements_[index].get_real_element(0)
-                              : REAL(get_value())[new_index];
+                              : REAL_ELT(get_value(), new_index);
     }
 
     /***************************************************************************
