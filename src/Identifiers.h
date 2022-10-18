@@ -1,19 +1,19 @@
-#ifndef MATCHR_IDENTIFIER_NAMES_H
-#define MATCHR_IDENTIFIER_NAMES_H
+#ifndef MATCHR_IDENTIFIERS_H
+#define MATCHR_IDENTIFIERS_H
 
 #include <vector>
 #include <string>
 
-class IdentifierNames {
+class Identifiers {
   public:
-    IdentifierNames() {
+    Identifiers() {
     }
 
-    IdentifierNames(const std::string& name): IdentifierNames() {
+    Identifiers(const std::string& name): Identifiers() {
         names_.push_back(name);
     }
 
-    bool operator==(const IdentifierNames& that) const {
+    bool operator==(const Identifiers& that) const {
         if (that.names_.size() != names_.size()) {
             return false;
         }
@@ -27,16 +27,16 @@ class IdentifierNames {
         return true;
     }
 
-    bool operator!=(const IdentifierNames& that) const {
+    bool operator!=(const Identifiers& that) const {
         return !operator==(that);
     }
 
-    IdentifierNames& operator+=(const IdentifierNames& that) {
+    Identifiers& operator+=(const Identifiers& that) {
         merge(that);
         return *this;
     }
 
-    IdentifierNames& operator=(const IdentifierNames& that) {
+    Identifiers& operator=(const Identifiers& that) {
         names_ = that.names_;
         return *this;
     }
@@ -71,14 +71,15 @@ class IdentifierNames {
         names_[index] = name;
     }
 
-    void merge(const IdentifierNames& that) {
+    Identifiers& merge(const Identifiers& that) {
         for (int index = 0; index < that.get_count(); ++index) {
             add(that.get_name(index));
         }
+        return *this;
     }
 
   private:
     std::vector<std::string> names_;
 };
 
-#endif /* MATCHR_IDENTIFIER_NAMES_H */
+#endif /* MATCHR_IDENTIFIERS_H */

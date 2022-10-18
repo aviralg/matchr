@@ -49,7 +49,7 @@ class SequencePattern: public VariadicPattern {
         std::cout << std::endl;
     }
 
-    Context match(RValue value, SEXP r_pat_env) const override final {
+    Context match(input_t input, SEXP r_pat_env) const override final {
         int input_size = value.get_length();
         int pattern_count = get_size();
 

@@ -2,42 +2,28 @@
 #define MATCHR_PATTERN_H
 
 #include "Context.h"
-#include "IdentifierNames.h"
+#include "Identifiers.h"
 #include "Range.h"
-#include "RValue.h"
+#include "input.h"
 
-class Pattern {
-  public:
-    virtual ~Pattern() {
-    }
+struct pattern_impl_t;
 
-    SEXP get_expression() const {
-        return r_expression_;
-    }
+typedef pattern_impl_t* pattern_t;
 
-    virtual Context match(RValue value, SEXP r_pat_env) const = 0;
+namespace pattern {
 
-    virtual IdentifierNames get_identifier_names() const = 0;
+void destroy(pattern_t pattern);
 
-    const Range& get_range() const {
-        return range_;
-    }
+const Identifiers& get_identifiers(pattern_t pattern);
 
-    void set_range(const Range& range) {
-        range_ = range;
-    }
+const Range& get_range(pattern_t pattern);
 
-    static Pattern* create(SEXP r_expression);
+SEXP get_expression(pattern_t pattern);
 
-  protected:
-    Pattern(SEXP r_expression): r_expression_(r_expression), range_(1, 1) {
-        // We don't need to preserve r_expression because the outermost match
-        // expression is preserved already by matcher.
-    }
+Context match(pattern_t pattern, input_t input, SEXP r_pat_env);
 
-  private:
-    SEXP r_expression_;
-    Range range_;
-};
+pattern_t parse(SEXP r_expression);
+
+} // namespace pattern
 
 #endif /* MATCHR_PATTERN_H */

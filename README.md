@@ -5,51 +5,47 @@
 match(value, pat ~ body, ...)
 
 ```
-<pat> ::= (<pat>)
-        | quote(<expr>)
-        | <id>
-        | .
+<pat> ::= (<pat>)                         match <pat> DO WE NEED THIS?
+        | quote(<expr>)                   match <expr> literally
+        | <id>                            match anything, bind identifier
+        | .                               match anything
+        | any(<pat> ...)                  match when any <pat> matches
+        | all(<pat> ...)                  match when all <pat> match
+        | none(<pat> ...)                 match when none of the <pat> match
+        | sat(<expr>)                     match if <expr>(val) is TRUE
+        | app(<expr>, <pat>)              match if <pat> matches result of <expr>(val)
         | <literal>
-        | <pat> && <pat>
-        | <pat> || <pat>
-        | !<pat>
-        | any(<pat> ...)
-        | all(<pat> ...)
-        | none(<pat> ...)
-        | sat(<expr>)
-        | apply(<expr>, <pat>)
-        | regex(<rx-pat>)
-        | regex(<rx-pat>, <pat>)
-        | vector(<patseq>)
+        | <vec-pat>
+        | function(<pat-seq> ...) <pat>
+        | while(<pat>) <pat>
+        | repeat <pat>
+        | for(<pat> in <pat>) <pat>
+        | if(<pat>) <pat>
+        | if(<pat>) <pat> else <pat>
+        | lang(<pat-seq>)
+        | {<pat-seq> ...}
+        | pat(<pat>)
 
-<literal> ::= <logical-atomic>
-            | <integer-atomic>
-            | <character-atomic>
-            | <double-atomic>
 
-<vector> ::= <logical-vector>
-           | <integer-vector>
-           | <double-vector>
-           | <character-vector>
-           | <raw-vector>
-           | <complex-vector>
+<vec-pat> ::= dbl(<pat-seq> ...)
+            | int(<pat-seq> ...)
+            | lgl(<pat-seq> ...)
+            | str(<pat-seq> ...)
+            | cpx(<pat-seq> ...)
+            | raw(<pat-seq> ...)
+            | vec(<pat-seq> ...)
 
-<logical-vector> ::= logical(<logical-atomic>, ...)
-                   | lgl(<logical-atomic>, ...)
+<pat-seq> ::= <pat>
+            | <pat>, ...
+            | <pat>, ...<num>
+            | <pat>, ..._<num>
+            | <pat>, ...<num>_<num>
 
-<integer-vector> ::= integer(<integer-atomic>, ...)
-                   | int(<integer-atomic>, ...)
-
-<double-vector> ::= double(<double-atomic>, ...)
-                  | dbl(<double-atomic>, ...)
-
-<character-vector> ::= character(<character-atomic>, ...)
-                     | chr(<character-atomic>, ...)
-
-<raw-vector> ::= raw(0-255, ...)
-
-<complex-vector> ::= complex(<double-atomic> + i <double-atomic>, ...)
-                   | cplx(<double-atomic> + i <double-atomic>, ...)
-
-<environment> ::= environment(x = )
+<literal> ::= NULL
+            | <lgl>
+            | <int>
+            | <dbl>
+            | <str>
+            | <dbl>i | reim(<dbl>, <dbl>)
+            | raw(0-255)
 ```

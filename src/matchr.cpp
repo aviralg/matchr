@@ -1,5 +1,5 @@
 #include "utilities.h"
-#include "Matcher.h"
+#include "matcher.h"
 
 bool initialized = false;
 
@@ -25,12 +25,12 @@ SEXP matchr_finalize() {
 }
 
 SEXP matchr_create(SEXP r_clauses, SEXP r_pat_env, SEXP r_eval_env) {
-    Matcher* matcher = Matcher::create(r_clauses, r_pat_env, r_eval_env);
-    return Matcher::to_sexp(matcher);
+    matcher_t matcher = matcher::parse(r_clauses, r_pat_env, r_eval_env);
+    return matcher::to_sexp(matcher);
 }
 
 SEXP matchr_match(SEXP r_matcher, SEXP r_value) {
-    Matcher* matcher = Matcher::from_sexp(r_matcher);
-    return matcher->match(r_value);
+    matcher_t matcher = matcher::from_sexp(r_matcher);
+    return matcher::match(matcher, r_value);
 }
 }

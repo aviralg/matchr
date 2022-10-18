@@ -15,8 +15,8 @@ class RangeUnaryPattern: public UnaryPattern {
         set_range(Range(minimum, maximum));
     }
 
-    Context match(RValue value, SEXP r_pat_env) const override final {
-        int length = value.get_length();
+    Context match(input_t input, SEXP r_pat_env) const override final {
+        int length = value::get_length(value);
 
         std::vector<Context> contexts;
         contexts.reserve(length);
@@ -24,7 +24,7 @@ class RangeUnaryPattern: public UnaryPattern {
         const Pattern* pattern = get_sub_pattern();
 
         for (int i = 0; i < length; ++i) {
-            RValue new_value = value.extract(i);
+            value_t new_value = value::extract(value, i);
             Context result = pattern->match(new_value, r_pat_env);
 
             if (!result) {
@@ -40,7 +40,7 @@ class RangeUnaryPattern: public UnaryPattern {
   private:
     Context merge(const std::vector<Context>& contexts, SEXPTYPE type) const {
         std::vector<std::string> identifiers;
-        std::vector<std::vector<RValue>> r_values;
+        std::vector<std::vector<output_t>> outputs;
 
         for (int i = 0; i < contexts.size(); ++i) {
             const Bindings& bindings = contexts[i].get_bindings();
@@ -56,7 +56,7 @@ class RangeUnaryPattern: public UnaryPattern {
                 const Bindings::Cell& cell_b = bindings.get_cell(b);
 
                 if (identifier == cell_b.identifier) {
-                    r_values[a].push_back(cell_b.r_value);
+                    outputs[a].push_back(cell_b.output);
                     ++a;
                     ++b;
                 }
@@ -68,7 +68,7 @@ class RangeUnaryPattern: public UnaryPattern {
                 else {
                     identifiers.insert(identifiers.begin() + a,
                                        cell_b.identifier);
-                    r_values.insert(r_values.begin() + a, {cell_b.r_value});
+                    outputs.insert(outputs.begin() + a, {cell_b.output});
                     ++a;
                     ++size_a;
                     ++b;
@@ -79,7 +79,7 @@ class RangeUnaryPattern: public UnaryPattern {
                 const Bindings::Cell& cell_b = bindings.get_cell(b);
 
                 identifiers.push_back(cell_b.identifier);
-                r_values.push_back({cell_b.r_value});
+                outputs.push_back({cell_b.output});
                 ++b;
             }
         }
@@ -88,7 +88,8 @@ class RangeUnaryPattern: public UnaryPattern {
         cells.reserve(identifiers.size());
         for (int i = 0; i < identifiers.size(); ++i) {
             Bindings::Cell cell{.identifier = identifiers[i],
-                                .r_value = RValue(type, r_values[i])};
+                                .output =
+                                    output::from_components(type, outputs[i])};
 
             cells.push_back(cell);
         }

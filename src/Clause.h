@@ -1,48 +1,22 @@
 #ifndef MATCHR_CLAUSE_H
 #define MATCHR_CLAUSE_H
 
-#include "Pattern.h"
-#include "Evaluand.h"
+#include "pattern.h"
 
-class Clause {
-  public:
-    ~Clause() {
-        delete pattern_;
-        delete evaluand_;
-    }
+struct clause_impl_t;
 
-    Pattern* get_pattern() {
-        return pattern_;
-    }
+typedef clause_impl_t* clause_t;
 
-    Evaluand* get_evaluand() {
-        return evaluand_;
-    }
+namespace clause {
 
-    SEXP match(SEXP r_value, SEXP r_pat_env, SEXP r_eval_env) {
-        SEXP r_result = NULL;
-        RValue value(r_value);
+clause_t create(pattern_t pattern, SEXP r_expression);
 
-        Pattern* pattern = get_pattern();
-        Context context = pattern->match(value, r_pat_env);
+clause_t parse(SEXP r_expression);
 
-        if (context) {
-            Evaluand* evaluand = get_evaluand();
-            r_result = evaluand->evaluate(context, r_eval_env);
-        }
+void destroy(clause_t clause);
 
-        return r_result;
-    }
+SEXP match(clause_t clause, SEXP r_value, SEXP r_pat_env, SEXP r_eval_env);
 
-    static Clause* create(SEXP r_expression);
-
-  private:
-    Pattern* pattern_;
-    Evaluand* evaluand_;
-
-    Clause(Pattern* pattern, Evaluand* evaluand)
-        : pattern_(pattern), evaluand_(evaluand) {
-    }
-};
+} // namespace clause
 
 #endif /* MATCHR_CLAUSE_H */

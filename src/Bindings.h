@@ -7,13 +7,14 @@
 #include "equality.h"
 #include "Optional.h"
 #include "utilities.h"
-#include "RValue.h"
+#include "output.h"
 #include <iostream>
+
 class Bindings {
   public:
     struct Cell {
         std::string identifier;
-        RValue r_value;
+        output_t output;
     };
 
     Bindings() {
@@ -31,7 +32,7 @@ class Bindings {
         return cells_[index];
     }
 
-    void bind(const std::string& identifier, RValue r_value) {
+    void bind(const std::string& identifier, const output_t& output) {
         int index;
 
         for (index = 0; index < get_size(); ++index) {
@@ -46,25 +47,21 @@ class Bindings {
             }
         }
 
-        Cell cell = {.identifier = identifier, .r_value = r_value};
+        Cell cell = {.identifier = identifier, .output = output};
         cells_.insert(cells_.begin() + index, cell);
     }
 
     SEXP as_environment(SEXP r_parent) const {
-        SEXP r_environment = PROTECT(new_dot_env(true, get_size(), r_parent));
-
-        std::cout << "here begin" << std::endl;
+        SEXP r_environment = PROTECT(new_environment(true, get_size(), r_parent));
 
         for (int index = 0; index < get_size(); ++index) {
             const Cell& cell = get_cell(index);
             std::cout << cell.identifier << std::endl;
             SEXP r_symbol = PROTECT(Rf_install(cell.identifier.c_str()));
-            SEXP r_value = PROTECT(cell.r_value.to_sexp());
+            SEXP r_value = PROTECT(output::to_sexp(cell.output));
             Rf_defineVar(r_symbol, r_value, r_environment);
             UNPROTECT(2);
         }
-
-        std::cout << "here end" << std::endl;
 
         UNPROTECT(1);
 
@@ -75,7 +72,7 @@ class Bindings {
        which is a linear time algorithm */
     Optional<Bindings> merge(const Bindings& bindings) const {
         std::vector<std::string> identifiers;
-        std::vector<RValue> r_value;
+        std::vector<output_t> outputs;
         std::vector<Cell> cells;
 
         int a = 0;
@@ -88,7 +85,11 @@ class Bindings {
             const Cell& cell_b = bindings.get_cell(b);
 
             if (cell_a.identifier == cell_b.identifier) {
-                if (cell_a.r_value != cell_b.r_value) {
+                Rf_error("cannot use the same identifier name more than "
+                         "once; non-linear patterns not supported yet");
+
+                /* TODO: compare here for equality
+                if (!view::is_equal(cell_a.view, cell_b.view)) {
                     return {};
                 }
 
@@ -96,6 +97,7 @@ class Bindings {
 
                 ++a;
                 ++b;
+                */
             }
 
             else if (cell_a.identifier < cell_b.identifier) {
@@ -124,57 +126,7 @@ class Bindings {
         return {Bindings(cells)};
     }
 
-    // RValue lookup(const std::string& identifier) const {
-    //     for (int index = 0; index < get_size(); ++index) {
-    //         if (identifiers_[index] == identifier) {
-    //             return Optional<RValue>(r_values_[index]);
-    //         }
-    //     }
-    //
-    //     return Optional<RValue>();
-    // }
-
-    // const std::vector<std::string>& get_identifiers() const {
-    //    return identifiers_;
-    //}
-
-    // bool is_mergeable(const Bindings& bindings) const {
-    //    const std::vector<std::string>&
-    //    identifiers(bindings.get_identifiers()); int this_index = 0; int
-    //    this_size = get_size();
-    //
-    //    int that_index = 0;
-    //    int that_size = bindings.get_size();
-    //
-    //    while (this_index < this_size && that_index < that_size) {
-    //        if (identifiers_[this_index] == identifiers[that_index]) {
-    //            SEXP this_value =
-    //                lookup(identifiers_[this_index]).get_value().to_sexp();
-    //            SEXP that_value =
-    //            bindings.lookup(identifiers_[that_index])
-    //                                  .get_value()
-    //                                  .to_sexp();
-    //            if (!is_equal(this_value, that_value)) {
-    //                return false;
-    //            }
-    //            ++this_index;
-    //            ++that_index;
-    //        }
-    //
-    //        else if (identifiers_[this_index] < identifiers[that_index]) {
-    //            ++this_index;
-    //        }
-    //
-    //        else {
-    //            ++that_index;
-    //        }
-    //    }
-    //    return true;
-    //}
-
   private:
-    /* identifier and rvalue are separate vectors to retrieve identifier
-       vector in constant time. */
     std::vector<Cell> cells_;
 };
 
