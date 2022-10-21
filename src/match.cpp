@@ -2,14 +2,27 @@
 #include "matcher.h"
 #include "Value.h"
 #include "Context.h"
+#include "Trace.h"
 
-Context* pattern_match(pattern_t pattern, Value* value);
-Context* match_slice(pattern_t pattern, int pat_idx, Value* value);
+Context* pattern_match(pattern_t pattern, Value* value, Trace* trace);
+Context* pattern_match_inner(pattern_t pattern, Value* value, Trace* trace);
+Context*
+match_slice(pattern_t pattern, int pat_idx, Value* value, Trace* trace);
 
-SEXP r_matchr_match(SEXP r_matcher, SEXP r_value) {
+SEXP r_matchr_match(SEXP r_matcher, SEXP r_value, SEXP r_trace) {
     matcher_t matcher = matcher_unwrap(r_matcher);
 
     int size = matcher->clauses.size();
+
+    if (TYPEOF(r_trace) != LGLSXP) {
+        Rf_error("argument 'trace' should be either TRUE or FALSE.");
+    }
+
+    bool enable = LOGICAL(r_trace)[0];
+
+    Trace* trace = new Trace(enable);
+
+    SEXP r_res = R_NilValue;
 
     for (int i = 0; i < size; ++i) {
         clause_t clause = matcher->clauses[i];
@@ -18,7 +31,7 @@ SEXP r_matchr_match(SEXP r_matcher, SEXP r_value) {
 
         Value* value = new Value(r_value);
 
-        Context* context = pattern_match(pattern, value);
+        Context* context = pattern_match(pattern, value, trace);
 
         // TODO: deletion should happen even if R code raises an error, so use
         // R's internal API.
@@ -29,16 +42,25 @@ SEXP r_matchr_match(SEXP r_matcher, SEXP r_value) {
             continue;
         }
 
-        SEXP r_env = context -> to_env(matcher->r_eval_env);
+        SEXP r_env = context->to_env(matcher->r_eval_env);
         delete context;
 
-        return Rf_eval(clause->r_expr, r_env);
+        r_res = Rf_eval(clause->r_expr, r_env);
+        break;
     }
 
-    return R_NilValue;
+    delete trace;
+    return r_res;
 }
 
-Context* pattern_match(pattern_t pattern, Value* value) {
+Context* pattern_match(pattern_t pattern, Value* value, Trace* trace) {
+    trace->enter_pattern(pattern);
+    Context* context = pattern_match_inner(pattern, value, trace);
+    trace->exit_pattern(context);
+    return context;
+}
+
+Context* pattern_match_inner(pattern_t pattern, Value* value, Trace* trace) {
     switch (pattern->type) {
         // id always matches and binds the value
     case pattern_type_t::ID: {
@@ -65,7 +87,7 @@ Context* pattern_match(pattern_t pattern, Value* value) {
     case pattern_type_t::ANY: {
         for (int i = 0; i < pattern_size(pattern); ++i) {
             pattern_t subpat = pattern_at(pattern, i);
-            Context* context = pattern_match(subpat, value);
+            Context* context = pattern_match(subpat, value, trace);
             if (context->is_true())
                 return context;
             delete context;
@@ -79,7 +101,7 @@ Context* pattern_match(pattern_t pattern, Value* value) {
         for (int i = 0; i < pattern_size(pattern) && context->is_true(); ++i) {
             pattern_t subpat = pattern_at(pattern, i);
 
-            Context* temp = pattern_match(subpat, value);
+            Context* temp = pattern_match(subpat, value, trace);
 
             if (temp->is_false()) {
                 delete context;
@@ -99,7 +121,7 @@ Context* pattern_match(pattern_t pattern, Value* value) {
         for (int i = 0; i < pattern_size(pattern); ++i) {
             pattern_t subpat = pattern_at(pattern, i);
 
-            Context* context = pattern_match(subpat, value);
+            Context* context = pattern_match(subpat, value, trace);
 
             bool elt_state = context->is_true();
 
@@ -122,7 +144,7 @@ Context* pattern_match(pattern_t pattern, Value* value) {
         }
 
         Value* slice = value->take(value->get_size());
-        Context* context = match_slice(pattern, 0, slice);
+        Context* context = match_slice(pattern, 0, slice, trace);
         delete slice;
         return context;
     }
@@ -135,7 +157,7 @@ Context* pattern_match(pattern_t pattern, Value* value) {
         }
 
         Value* slice = value->take(value->get_size());
-        Context* context = match_slice(pattern, 0, slice);
+        Context* context = match_slice(pattern, 0, slice, trace);
         delete slice;
         return context;
     }
@@ -148,7 +170,7 @@ Context* pattern_match(pattern_t pattern, Value* value) {
         }
 
         Value* slice = value->take(value->get_size());
-        Context* context = match_slice(pattern, 0, slice);
+        Context* context = match_slice(pattern, 0, slice, trace);
         delete slice;
         return context;
     }
@@ -160,7 +182,7 @@ Context* pattern_match(pattern_t pattern, Value* value) {
     }
 }
 
-Context* match_slice(pattern_t pattern, int pat_idx, Value* value) {
+Context* match_slice(pattern_t pattern, int pat_idx, Value* value, Trace* trace) {
     int pat_size = pattern_size(pattern);
 
     // if all patterns have been matched but the vector still has unmatched
@@ -184,13 +206,14 @@ Context* match_slice(pattern_t pattern, int pat_idx, Value* value) {
     for (int i = low; i <= high; ++i) {
         /* check if first i elements match the pattern */
         Value* left_slice = value->take(i);
-        Context* head = pattern_match(elt, left_slice);
+        Context* head = pattern_match(elt, left_slice, trace);
         delete left_slice;
 
         /* check if rest of the elements match the remaining patterns */
         if (head->is_true()) {
             Value* right_slice = value->drop(i);
-            Context* tail = match_slice(pattern, pat_idx + 1, right_slice);
+            Context* tail =
+                match_slice(pattern, pat_idx + 1, right_slice, trace);
             delete right_slice;
 
             if (tail->is_true()) {

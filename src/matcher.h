@@ -60,6 +60,8 @@ int pattern_size(pattern_t pattern);
 
 pattern_t pattern_at(pattern_t pattern, int index);
 
+SEXP pattern_expr(pattern_t pattern);
+
 /********************************************************************************
  * CLAUSE
  *******************************************************************************/

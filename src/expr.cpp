@@ -3,7 +3,6 @@
 #include <sstream>
 
 SEXP clause_expr(clause_t clause);
-SEXP pattern_expr(pattern_t pattern);
 SEXP pattern_seq_expr(SEXP r_fun, const std::vector<pattern_t>& patterns);
 SEXP range_sym(pattern_t pattern);
 

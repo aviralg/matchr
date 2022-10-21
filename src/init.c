@@ -4,7 +4,7 @@
 
 static const R_CallMethodDef CallEntries[] = {
     {"matchr_parse", (DL_FUNC) &r_matchr_parse, 3},
-    {"matchr_match", (DL_FUNC) &r_matchr_match, 2},
+    {"matchr_match", (DL_FUNC) &r_matchr_match, 3},
     {"matchr_expr", (DL_FUNC) &r_matchr_expr, 1},
     {NULL, NULL, 0}
 };
