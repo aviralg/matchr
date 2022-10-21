@@ -84,7 +84,7 @@ SEXP pattern_seq_expr(SEXP r_fun, const std::vector<pattern_t>& patterns) {
             ++range_n;
             SEXP r_sym = range_sym(pattern);
             r_result = PROTECT(CONS(r_sym, r_result));
-            pattern = pattern->patterns[0];
+            pattern = pattern_at(pattern, 0);
         }
 
         SEXP r_pattern = pattern_expr(pattern);

@@ -6,6 +6,17 @@
 #include <string>
 
 /********************************************************************************
+ * RANGE
+ *******************************************************************************/
+
+struct range_t {
+    int min;
+    int max;
+};
+
+range_t range_create(int min, int max);
+
+/********************************************************************************
  * PATTERN
  *******************************************************************************/
 
@@ -43,6 +54,12 @@ pattern_t pattern_create(pattern_type_t type);
 
 void pattern_destroy(pattern_t pattern);
 
+range_t pattern_range(pattern_t pattern);
+
+int pattern_size(pattern_t pattern);
+
+pattern_t pattern_at(pattern_t pattern, int index);
+
 /********************************************************************************
  * CLAUSE
  *******************************************************************************/
@@ -70,7 +87,9 @@ struct matcher_impl_t {
 
 typedef matcher_impl_t* matcher_t;
 
-matcher_t matcher_create(const std::vector<clause_t>& clauses, SEXP r_pat_env, SEXP r_eval_env);
+matcher_t matcher_create(const std::vector<clause_t>& clauses,
+                         SEXP r_pat_env,
+                         SEXP r_eval_env);
 
 void matcher_destroy(matcher_t matcher);
 
