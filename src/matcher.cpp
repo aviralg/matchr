@@ -34,6 +34,11 @@ range_t pattern_range(pattern_t pattern) {
     case pattern_type_t::LGLVAL:
     case pattern_type_t::INTVAL:
     case pattern_type_t::DBLVAL:
+    case pattern_type_t::CPXVAL:
+    case pattern_type_t::STRVAL:
+    case pattern_type_t::RAWVAL:
+    case pattern_type_t::REIM:
+    case pattern_type_t::NA_POLY:
         return range_create(1, 1);
     case pattern_type_t::ANY:
     case pattern_type_t::ALL:
@@ -41,6 +46,9 @@ range_t pattern_range(pattern_t pattern) {
     case pattern_type_t::LGLVEC:
     case pattern_type_t::INTVEC:
     case pattern_type_t::DBLVEC:
+    case pattern_type_t::CPXVEC:
+    case pattern_type_t::STRVEC:
+    case pattern_type_t::RAWVEC:
     case pattern_type_t::RANGE: {
         int lo = INT_MAX;
         int hi = 0;

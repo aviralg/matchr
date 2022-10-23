@@ -7,6 +7,8 @@
 Context* pattern_match(pattern_t pattern, Value* value, Trace* trace);
 Context* pattern_match_inner(pattern_t pattern, Value* value, Trace* trace);
 Context*
+match_vec(pattern_t pattern, Value* value, SEXPTYPE type, Trace* trace);
+Context*
 match_slice(pattern_t pattern, int pat_idx, Value* value, Trace* trace);
 
 SEXP r_matchr_match(SEXP r_matcher, SEXP r_value, SEXP r_trace) {
@@ -29,7 +31,7 @@ SEXP r_matchr_match(SEXP r_matcher, SEXP r_value, SEXP r_trace) {
 
         pattern_t pattern = clause->pattern;
 
-        Value* value = new Value(r_value);
+        Value* value = new RawValue(r_value);
 
         Context* context = pattern_match(pattern, value, trace);
 
@@ -84,6 +86,47 @@ Context* pattern_match_inner(pattern_t pattern, Value* value, Trace* trace) {
     case pattern_type_t::DBLVAL:
         return new Context(value->is_dbl1(pattern->dbl_val));
 
+    case pattern_type_t::STRVAL:
+        return new Context(value->is_str1(pattern->str_val));
+
+    case pattern_type_t::CPXVAL:
+        return new Context(value->is_cpx1(pattern->cpx_val));
+
+    case pattern_type_t::RAWVAL:
+        return new Context(value->is_raw1(pattern->raw_val));
+
+    case pattern_type_t::NA_POLY:
+        return new Context(value->is_na1());
+
+    case pattern_type_t::REIM: {
+        if (value->get_type() != CPLXSXP || value->get_size() != 1) {
+            return new Context(false);
+        }
+
+        Value* real_value = new ComplexValue(value, true);
+        Context* real_ctxt =
+            pattern_match(pattern->patterns[0], real_value, trace);
+        delete real_value;
+
+        if (real_ctxt->is_false()) {
+            return real_ctxt;
+        }
+
+        Value* imag_value = new ComplexValue(value, false);
+        Context* imag_ctxt =
+            pattern_match(pattern->patterns[1], imag_value, trace);
+        delete imag_value;
+
+        if (imag_ctxt->is_false()) {
+            delete real_ctxt;
+            return imag_ctxt;
+        }
+
+        real_ctxt->consume(imag_ctxt);
+        delete imag_ctxt;
+        return real_ctxt;
+    }
+
     case pattern_type_t::ANY: {
         for (int i = 0; i < pattern_size(pattern); ++i) {
             pattern_t subpat = pattern_at(pattern, i);
@@ -136,44 +179,23 @@ Context* pattern_match_inner(pattern_t pattern, Value* value, Trace* trace) {
         return new Context(!state);
     }
 
-    case pattern_type_t::LGLVEC: {
-        /* is_slice check ensures that vec nested inside vec will never match.
-         */
-        if (value->get_type() != LGLSXP || value->is_slice()) {
-            return new Context(false);
-        }
+    case pattern_type_t::LGLVEC:
+        return match_vec(pattern, value, LGLSXP, trace);
 
-        Value* slice = value->take(value->get_size());
-        Context* context = match_slice(pattern, 0, slice, trace);
-        delete slice;
-        return context;
-    }
+    case pattern_type_t::INTVEC:
+        return match_vec(pattern, value, INTSXP, trace);
 
-    case pattern_type_t::INTVEC: {
-        /* is_slice check ensures that vec nested inside vec will never match.
-         */
-        if (value->get_type() != INTSXP || value->is_slice()) {
-            return new Context(false);
-        }
+    case pattern_type_t::DBLVEC:
+        return match_vec(pattern, value, REALSXP, trace);
 
-        Value* slice = value->take(value->get_size());
-        Context* context = match_slice(pattern, 0, slice, trace);
-        delete slice;
-        return context;
-    }
+    case pattern_type_t::STRVEC:
+        return match_vec(pattern, value, STRSXP, trace);
 
-    case pattern_type_t::DBLVEC: {
-        /* is_slice check ensures that vec nested inside vec will never match.
-         */
-        if (value->get_type() != REALSXP || value->is_slice()) {
-            return new Context(false);
-        }
+    case pattern_type_t::CPXVEC:
+        return match_vec(pattern, value, CPLXSXP, trace);
 
-        Value* slice = value->take(value->get_size());
-        Context* context = match_slice(pattern, 0, slice, trace);
-        delete slice;
-        return context;
-    }
+    case pattern_type_t::RAWVEC:
+        return match_vec(pattern, value, RAWSXP, trace);
 
     case pattern_type_t::RANGE: {
         Rf_error("range should be handled in pattern_seq_expr");
@@ -182,7 +204,22 @@ Context* pattern_match_inner(pattern_t pattern, Value* value, Trace* trace) {
     }
 }
 
-Context* match_slice(pattern_t pattern, int pat_idx, Value* value, Trace* trace) {
+Context*
+match_vec(pattern_t pattern, Value* value, SEXPTYPE type, Trace* trace) {
+    /* is_slice check ensures that vec nested inside vec will never match.
+     */
+    if (value->get_type() != type || value->is_slice()) {
+        return new Context(false);
+    }
+
+    Value* slice = value->take(value->get_size());
+    Context* context = match_slice(pattern, 0, slice, trace);
+    delete slice;
+    return context;
+}
+
+Context*
+match_slice(pattern_t pattern, int pat_idx, Value* value, Trace* trace) {
     int pat_size = pattern_size(pattern);
 
     // if all patterns have been matched but the vector still has unmatched

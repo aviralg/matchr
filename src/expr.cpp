@@ -1,5 +1,6 @@
 #include "matchr.h"
 #include "matcher.h"
+#include "utils.h"
 #include <sstream>
 
 SEXP clause_expr(clause_t clause);
@@ -47,6 +48,30 @@ SEXP pattern_expr(pattern_t pattern) {
     case pattern_type_t::DBLVAL:
         return ScalarReal(pattern->dbl_val);
 
+    case pattern_type_t::STRVAL:
+        return ScalarString(str_wrap(pattern->str_val));
+
+    case pattern_type_t::CPXVAL: {
+        SEXP r_vec = PROTECT(Rf_allocVector(CPLXSXP, 1));
+        SET_COMPLEX_ELT(r_vec, 0, pattern->cpx_val);
+        UNPROTECT(1);
+        return r_vec;
+    }
+
+    case pattern_type_t::RAWVAL: {
+        SEXP r_vec = PROTECT(Rf_allocVector(INTSXP, 1));
+        SET_INTEGER_ELT(r_vec, 0, pattern->raw_val);
+        SEXP r_res = PROTECT(Rf_lang2(Rf_install("raw"), r_vec));
+        UNPROTECT(2);
+        return r_res;
+    }
+
+    case pattern_type_t::REIM:
+        return pattern_seq_expr(Rf_install("reim"), pattern->patterns);
+
+    case pattern_type_t::NA_POLY:
+        return pattern_seq_expr(Rf_install("na"), pattern->patterns);
+
     case pattern_type_t::ANY:
         return pattern_seq_expr(Rf_install("any"), pattern->patterns);
 
@@ -64,6 +89,15 @@ SEXP pattern_expr(pattern_t pattern) {
 
     case pattern_type_t::DBLVEC:
         return pattern_seq_expr(Rf_install("dbl"), pattern->patterns);
+
+    case pattern_type_t::STRVEC:
+        return pattern_seq_expr(Rf_install("str"), pattern->patterns);
+
+    case pattern_type_t::CPXVEC:
+        return pattern_seq_expr(Rf_install("cpx"), pattern->patterns);
+
+    case pattern_type_t::RAWVEC:
+        return pattern_seq_expr(Rf_install("raw"), pattern->patterns);
 
     case pattern_type_t::RANGE:
         Rf_error("range should be handled in pattern_seq_expr");

@@ -1,14 +1,11 @@
 #include "Value.h"
 
 Value* Value::take(int size) const {
-    return new SliceValue(
-        get_value(), this->tf_index(0), this->tf_index(size - 1));
+    return new SliceValue(this, 0, size - 1);
 }
 
 Value* Value::drop(int size) const {
-    return new SliceValue(get_value(),
-                          this->tf_index(size),
-                          this->tf_index(this->get_size() - 1));
+    return new SliceValue(this, size, this->get_size() - 1);
 }
 
 bool Value::is_equal(Value* other) const {
@@ -57,7 +54,52 @@ bool Value::is_equal(Value* other) const {
         }
 
         for (int i = 0; i < size; ++i) {
-            if (this->get_dbl(i) != other->get_dbl(i)) {
+            if (!cmp_dbl(this->get_dbl(i), other->get_dbl(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    case STRSXP: {
+        int size = this->get_size();
+        if (size != other->get_size()) {
+            return false;
+        }
+
+        for (int i = 0; i < size; ++i) {
+            if (!cmp_str(this->get_str(i), other->get_str(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    case CPLXSXP: {
+        int size = this->get_size();
+        if (size != other->get_size()) {
+            return false;
+        }
+
+        for (int i = 0; i < size; ++i) {
+            if (!cmp_cpx(this->get_cpx(i), other->get_cpx(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    case RAWSXP: {
+        int size = this->get_size();
+        if (size != other->get_size()) {
+            return false;
+        }
+
+        for (int i = 0; i < size; ++i) {
+            if (this->get_raw(i) != other->get_raw(i)) {
                 return false;
             }
         }

@@ -25,12 +25,20 @@ enum class pattern_type_t {
     LGLVAL,
     INTVAL,
     DBLVAL,
+    STRVAL,
+    CPXVAL,
+    RAWVAL,
+    REIM,
+    NA_POLY,
     ANY,
     ALL,
     NONE,
     LGLVEC,
     INTVEC,
     DBLVEC,
+    STRVEC,
+    CPXVEC,
+    RAWVEC,
     RANGE
 };
 

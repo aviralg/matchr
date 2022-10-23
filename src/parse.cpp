@@ -1,5 +1,6 @@
 #include "matchr.h"
 #include "matcher.h"
+#include "utils.h"
 #include <cstdio>
 #include <cstdarg>
 
@@ -146,29 +147,37 @@ void parse_pattern(state_t state, SEXP r_pattern, bool range_pat) {
     case LGLSXP: {
         pattern_t pattern = pattern_create(pattern_type_t::LGLVAL);
         pattern->lgl_val = LOGICAL(r_pattern)[0];
-
         state->patterns->push_back(pattern);
-    }
-
         return;
+    }
 
     case INTSXP: {
         pattern_t pattern = pattern_create(pattern_type_t::INTVAL);
         pattern->int_val = INTEGER(r_pattern)[0];
-
         state->patterns->push_back(pattern);
-    }
-
         return;
+    }
 
     case REALSXP: {
         pattern_t pattern = pattern_create(pattern_type_t::DBLVAL);
         pattern->dbl_val = REAL(r_pattern)[0];
-
         state->patterns->push_back(pattern);
+        return;
     }
 
+    case STRSXP: {
+        pattern_t pattern = pattern_create(pattern_type_t::STRVAL);
+        pattern->str_val = str_dup(str_unwrap(STRING_ELT(r_pattern, 0)));
+        state->patterns->push_back(pattern);
         return;
+    }
+
+    case CPLXSXP: {
+        pattern_t pattern = pattern_create(pattern_type_t::CPXVAL);
+        pattern->cpx_val = COMPLEX_ELT(r_pattern, 0);
+        state->patterns->push_back(pattern);
+        return;
+    }
 
     case LANGSXP: {
         SEXP r_head = CAR(r_pattern);
@@ -179,7 +188,52 @@ void parse_pattern(state_t state, SEXP r_pattern, bool range_pat) {
 
         const char* head = CHAR(PRINTNAME(r_head));
 
-        if (!strcmp(head, "any")) {
+        if (!strcmp(head, "pat")) {
+            if (Rf_length(r_pattern) != 2) {
+                parse_error(state, "2invalid pattern");
+            }
+            parse_pattern(state, CADR(r_pattern), false);
+        }
+
+        else if (!strcmp(head, "reim")) {
+            if (Rf_length(r_pattern) != 3) {
+                parse_error(state, "2invalid pattern");
+            }
+            parse_seq_pat(state, pattern_type_t::REIM, CDR(r_pattern), false);
+        }
+
+        else if (!strcmp(head, "raw")) {
+            if (Rf_length(r_pattern) != 2) {
+                parse_error(state, "2invalid pattern");
+            }
+
+            SEXP r_arg = CADR(r_pattern);
+
+            if (TYPEOF(r_arg) != INTSXP || Rf_length(r_arg) != 1) {
+                parse_error(state, "invalid pattern");
+            }
+
+            int raw_val = INTEGER(r_arg)[0];
+
+            if (raw_val < 0 || raw_val > 255) {
+                parse_error(state, "invalid pattern");
+            }
+
+            pattern_t pattern = pattern_create(pattern_type_t::RAWVAL);
+            pattern->raw_val = raw_val;
+            state->patterns->push_back(pattern);
+
+        }
+
+        else if (!strcmp(head, "na")) {
+            if (Rf_length(r_pattern) != 1) {
+                parse_error(state, "2invalid pattern");
+            }
+            pattern_t pattern = pattern_create(pattern_type_t::NA_POLY);
+            state->patterns->push_back(pattern);
+        }
+
+        else if (!strcmp(head, "any")) {
             parse_seq_pat(state, pattern_type_t::ANY, CDR(r_pattern), false);
         }
 
@@ -189,13 +243,6 @@ void parse_pattern(state_t state, SEXP r_pattern, bool range_pat) {
 
         else if (!strcmp(head, "none")) {
             parse_seq_pat(state, pattern_type_t::NONE, CDR(r_pattern), false);
-        }
-
-        else if (!strcmp(head, "pat")) {
-            if (Rf_length(r_pattern) != 2) {
-                parse_error(state, "2invalid pattern");
-            }
-            parse_pattern(state, CADR(r_pattern), false);
         }
 
         else if (!strcmp(head, "lgl")) {
@@ -208,6 +255,18 @@ void parse_pattern(state_t state, SEXP r_pattern, bool range_pat) {
 
         else if (!strcmp(head, "dbl")) {
             parse_seq_pat(state, pattern_type_t::DBLVEC, CDR(r_pattern), true);
+        }
+
+        else if (!strcmp(head, "str")) {
+            parse_seq_pat(state, pattern_type_t::STRVEC, CDR(r_pattern), true);
+        }
+
+        else if (!strcmp(head, "cpx")) {
+            parse_seq_pat(state, pattern_type_t::CPXVEC, CDR(r_pattern), true);
+        }
+
+        else if (!strcmp(head, "raw")) {
+            parse_seq_pat(state, pattern_type_t::RAWVEC, CDR(r_pattern), true);
         }
 
         else {
@@ -332,4 +391,3 @@ void parse_id_or_range(state_t state, const char* name, bool range_pat) {
         parse_error(state, "invalid range specifier: %s", name);
     }
 }
-
