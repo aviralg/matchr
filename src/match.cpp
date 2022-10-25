@@ -10,6 +10,7 @@ Context*
 match_vec(pattern_t pattern, Value* value, SEXPTYPE type, Trace* trace);
 Context*
 match_slice(pattern_t pattern, int pat_idx, Value* value, Trace* trace);
+Context* match_range(pattern_t pattern, Value* value, Trace* trace);
 
 SEXP r_matchr_match(SEXP r_matcher, SEXP r_value, SEXP r_trace) {
     matcher_t matcher = matcher_unwrap(r_matcher);
@@ -197,10 +198,8 @@ Context* pattern_match_inner(pattern_t pattern, Value* value, Trace* trace) {
     case pattern_type_t::RAWVEC:
         return match_vec(pattern, value, RAWSXP, trace);
 
-    case pattern_type_t::RANGE: {
-        Rf_error("range should be handled in pattern_seq_expr");
-        return nullptr;
-    }
+    case pattern_type_t::RANGE:
+        return match_range(pattern, value, trace);
     }
 }
 
@@ -240,7 +239,7 @@ match_slice(pattern_t pattern, int pat_idx, Value* value, Trace* trace) {
     int low = range.min;
     int high = std::min(range.max, value->get_size());
 
-    for (int i = low; i <= high; ++i) {
+    for (int i = high; i >= low; --i) {
         /* check if first i elements match the pattern */
         Value* left_slice = value->take(i);
         Context* head = pattern_match(elt, left_slice, trace);
@@ -264,4 +263,56 @@ match_slice(pattern_t pattern, int pat_idx, Value* value, Trace* trace) {
     }
 
     return new Context(false);
+}
+
+Context* match_range(pattern_t pattern, Value* value, Trace* trace) {
+    pattern_t sub_pat = pattern->patterns[0];
+
+    std::vector<Context*> contexts;
+
+    for (int i = 0; i < value->get_size(); ++i) {
+
+        Value* elt = value->pick(i);
+        Context* context = pattern_match(sub_pat, elt, trace);
+        delete elt;
+
+        contexts.push_back(context);
+
+        if (context->is_false()) {
+            break;
+        }
+    }
+
+    Context* res = nullptr;
+
+    if (contexts.size() > 0 && contexts.back()->is_false()) {
+        res = new Context(false);
+    } else {
+        res = new Context(true);
+
+        std::vector<std::string> ids = pattern_ids(sub_pat);
+
+        for (const std::string& id: ids) {
+            RangeValue* value = new RangeValue();
+
+            for (Context* ctxt: contexts) {
+                const Value* val = ctxt->lookup(id, nullptr);
+
+                if (val == nullptr) {
+                    Rf_error("identifier %s not bound in context", id.c_str());
+                }
+
+                value->push_back(val);
+            }
+
+            res->bind(id, value);
+        }
+    }
+
+    for (int i = 0; i < contexts.size(); ++i) {
+        Context* context = contexts[i];
+        delete context;
+    }
+
+    return res;
 }

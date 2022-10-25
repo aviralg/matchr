@@ -100,7 +100,8 @@ SEXP pattern_expr(pattern_t pattern) {
         return pattern_seq_expr(Rf_install("raw"), pattern->patterns);
 
     case pattern_type_t::RANGE:
-        Rf_error("range should be handled in pattern_seq_expr");
+        // TODO: add canonical form
+        //Rf_error("range should be handled in pattern_seq_expr");
         return R_NilValue;
     }
 }

@@ -285,16 +285,18 @@ void parse_seq_pat(state_t state,
                    pattern_type_t pat_type,
                    SEXP r_pattern,
                    bool range_pat) {
-    int n = 0;
-
     int init_size = state->patterns->size();
 
-    for (SEXP r_ptr = r_pattern; r_ptr != R_NilValue; r_ptr = CDR(r_ptr), ++n) {
+    // whether the previously parsed pattern is a range or not.
+    bool prev_range_pat = true;
+
+    for (SEXP r_ptr = r_pattern; r_ptr != R_NilValue; r_ptr = CDR(r_ptr)) {
         SEXP r_elt = CAR(r_ptr);
-        // both range_pat should be true and position should be odd for range
-        // pattern to be valid.
-        bool temp_range_pat = range_pat && (n % 2 == 1);
+        // both range_pat should be true and previous pattern should not be a range.
+        bool temp_range_pat = range_pat && !prev_range_pat;
         parse_pattern(state, r_elt, temp_range_pat);
+
+        prev_range_pat = state->patterns->back()->type == pattern_type_t::RANGE;
     }
 
     pattern_t pattern = pattern_create(pat_type);

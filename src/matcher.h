@@ -70,6 +70,8 @@ pattern_t pattern_at(pattern_t pattern, int index);
 
 SEXP pattern_expr(pattern_t pattern);
 
+std::vector<std::string> pattern_ids(pattern_t pattern);
+
 /********************************************************************************
  * CLAUSE
  *******************************************************************************/

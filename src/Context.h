@@ -33,6 +33,11 @@ class Context {
         }
     }
 
+    const Value* lookup(const std::string& name, Value* other) {
+        auto iter = bindings_.find(name);
+        return iter == bindings_.end() ? other : iter->second;
+    }
+
     // move bindings from other to here.
     void consume(Context* other) {
         for (auto it = other->bindings_.begin();
@@ -57,9 +62,9 @@ class Context {
 
         for (auto it = bindings_.begin(); it != bindings_.end(); ++it) {
             const std::string& name = it->first;
-            const Value* value = it -> second;
+            const Value* value = it->second;
 
-            SEXP r_val = PROTECT(value -> to_sexp());
+            SEXP r_val = PROTECT(value->to_sexp());
 
             Rf_defineVar(Rf_install(name.c_str()), r_val, r_env);
 

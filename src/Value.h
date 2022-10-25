@@ -3,6 +3,7 @@
 
 #include "Rincludes.h"
 #include "utils.h"
+#include <vector>
 
 class Value {
   public:
@@ -31,6 +32,8 @@ class Value {
     virtual Rcomplex get_cpx(int index) const = 0;
 
     virtual Rbyte get_raw(int index) const = 0;
+
+    virtual Value* get_elt(int index) const = 0;
 
     bool is_na1() const {
         return is_lgl1(NA_LOGICAL) || is_int1(NA_INTEGER) || is_dbl1(NA_REAL) ||
@@ -70,6 +73,8 @@ class Value {
     Value* take(int size) const;
 
     Value* drop(int size) const;
+
+    Value* pick(int index) const;
 
     bool is_equal(Value* other) const;
 
@@ -128,6 +133,10 @@ class RawValue: public Value {
         return RAW_ELT(get_value(), index);
     }
 
+    virtual Value* get_elt(int index) const override {
+        return new RawValue(VECTOR_ELT(r_value_, index));
+    }
+
   private:
     SEXP r_value_;
 };
@@ -182,6 +191,10 @@ class SliceValue: public Value {
         return value_->get_raw(tf_index_(index));
     }
 
+    virtual Value* get_elt(int index) const override {
+        return value_->get_elt(tf_index_(index));
+    }
+
   private:
     Value* value_;
     int left_;
@@ -190,6 +203,82 @@ class SliceValue: public Value {
     int tf_index_(int index) const {
         return index + left_;
     }
+};
+
+class RangeValue: public Value {
+  public:
+    RangeValue(): Value() {
+    }
+
+    virtual ~RangeValue() {
+        for (int i = 0; i < values_.size(); ++i) {
+            delete values_[i];
+        }
+    }
+
+    virtual Value* clone() const override {
+        RangeValue* value = new RangeValue();
+
+        int size = values_.size();
+        for (int i = 0; i < size; ++i) {
+            value->push_back(values_[i]);
+        }
+
+        return value;
+    }
+
+    void push_back(const Value* value) {
+        values_.push_back(value->clone());
+    }
+
+    bool is_slice() const override {
+        return true;
+    }
+
+    virtual int get_size() const override {
+        return values_.size();
+    }
+
+    virtual SEXPTYPE get_type() const override {
+        return VECSXP;
+    }
+
+    virtual int get_lgl(int index) const override {
+        Rf_error("Value::get_lgl not valid");
+        return NA_LOGICAL;
+    }
+
+    virtual int get_int(int index) const override {
+        Rf_error("Value::get_int not valid");
+        return NA_INTEGER;
+    }
+
+    virtual double get_dbl(int index) const override {
+        Rf_error("Value::get_dbl not valid");
+        return NA_REAL;
+    }
+
+    virtual const char* get_str(int index) const override {
+        Rf_error("Value::get_str not valid");
+        return nullptr;
+    }
+
+    virtual Rcomplex get_cpx(int index) const override {
+        Rf_error("Value::get_cpx not valid");
+        return Rcomplex{NA_REAL, NA_REAL};
+    }
+
+    virtual Rbyte get_raw(int index) const override {
+        Rf_error("Value::get_raw not valid");
+        return 255;
+    }
+
+    virtual Value* get_elt(int index) const override {
+        return values_[index];
+    }
+
+  private:
+    std::vector<Value*> values_;
 };
 
 class ComplexValue: public Value {
@@ -246,6 +335,11 @@ class ComplexValue: public Value {
     virtual Rbyte get_raw(int index) const override {
         Rf_error("Value::get_raw not valid");
         return 255;
+    }
+
+    virtual Value* get_elt(int index) const override {
+        Rf_error("Value::get_elt not valid");
+        return nullptr;
     }
 
   private:

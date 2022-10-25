@@ -48,8 +48,7 @@ range_t pattern_range(pattern_t pattern) {
     case pattern_type_t::DBLVEC:
     case pattern_type_t::CPXVEC:
     case pattern_type_t::STRVEC:
-    case pattern_type_t::RAWVEC:
-    case pattern_type_t::RANGE: {
+    case pattern_type_t::RAWVEC: {
         int lo = INT_MAX;
         int hi = 0;
         for (int i = 0; i < pattern_size(pattern); ++i) {
@@ -64,6 +63,8 @@ range_t pattern_range(pattern_t pattern) {
 
         return range_create(lo, hi);
     }
+    case pattern_type_t::RANGE:
+        return range_create(pattern->min, pattern->max);
     }
 }
 
@@ -73,6 +74,56 @@ int pattern_size(pattern_t pattern) {
 
 pattern_t pattern_at(pattern_t pattern, int index) {
     return pattern->patterns.at(index);
+}
+
+void add_id(std::vector<std::string>& ids, const std::string& id) {
+    if (id == ".") {
+        return;
+    }
+
+    for (int i = 0; i < ids.size(); ++i) {
+        if (ids[i] == id)
+            return;
+    }
+
+    ids.push_back(id);
+}
+
+void pattern_ids_helper(const pattern_t pattern,
+                        std::vector<std::string>& ids) {
+    switch (pattern->type) {
+    case pattern_type_t::ID:
+        add_id(ids, pattern->id);
+    case pattern_type_t::LGLVAL:
+    case pattern_type_t::INTVAL:
+    case pattern_type_t::DBLVAL:
+    case pattern_type_t::CPXVAL:
+    case pattern_type_t::STRVAL:
+    case pattern_type_t::RAWVAL:
+    case pattern_type_t::NA_POLY:
+        return;
+    case pattern_type_t::REIM:
+    case pattern_type_t::ANY:
+    case pattern_type_t::ALL:
+    case pattern_type_t::NONE:
+    case pattern_type_t::LGLVEC:
+    case pattern_type_t::INTVEC:
+    case pattern_type_t::DBLVEC:
+    case pattern_type_t::CPXVEC:
+    case pattern_type_t::STRVEC:
+    case pattern_type_t::RAWVEC:
+    case pattern_type_t::RANGE: {
+        for (const pattern_t subpat: pattern->patterns) {
+            pattern_ids_helper(subpat, ids);
+        }
+    }
+    }
+}
+
+std::vector<std::string> pattern_ids(pattern_t pattern) {
+    std::vector<std::string> ids;
+    pattern_ids_helper(pattern, ids);
+    return ids;
 }
 
 /********************************************************************************
